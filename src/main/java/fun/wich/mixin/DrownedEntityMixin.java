@@ -15,11 +15,9 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(DrownedEntity.class)
 public class DrownedEntityMixin extends ZombieEntity {
-
 	public DrownedEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) {
 		super(entityType, world);
 	}
-
 	@Override
 	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
 		DrownedVillagerEntity zombieVillagerEntity = villager.convertTo(ZombieVillagerVariants.DROWNED_VILLAGER, EntityConversionContext.create(villager, true, true), zombieVillager -> {

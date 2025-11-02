@@ -1,6 +1,5 @@
 package fun.wich.mixin;
 
-import fun.wich.DrownedVillagerEntity;
 import fun.wich.ZombieVillagerVariants;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -17,7 +16,6 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(HuskEntity.class)
 public class HuskEntityMixin extends ZombieEntity {
 	public HuskEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
-
 	@Override
 	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
 		ZombieVillagerEntity zombieVillagerEntity = villager.convertTo(ZombieVillagerVariants.VILLAGER_HUSK, EntityConversionContext.create(villager, true, true), zombieVillager -> {

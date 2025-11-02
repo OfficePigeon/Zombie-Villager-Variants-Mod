@@ -16,10 +16,7 @@ public class VillagerHostilesSensorMixin {
 	protected void Matches(ServerWorld world, LivingEntity entity, LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
 		double distance = entity.squaredDistanceTo(target);
 		EntityType<?> type = target.getType();
-		if (type == ZombieVillagerVariants.DROWNED_VILLAGER) {
-			if (distance <= 64) cir.setReturnValue(true);
-		}
-		else if (type == ZombieVillagerVariants.VILLAGER_HUSK) {
+		if (type == ZombieVillagerVariants.DROWNED_VILLAGER || type == ZombieVillagerVariants.VILLAGER_HUSK) {
 			if (distance <= 64) cir.setReturnValue(true);
 		}
 	}

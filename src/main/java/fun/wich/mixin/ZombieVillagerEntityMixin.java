@@ -29,15 +29,13 @@ public abstract class ZombieVillagerEntityMixin extends ZombieEntity implements 
 	@Shadow private @Nullable TradeOfferList offerData;
 	@Shadow public abstract VillagerData getVillagerData();
 	@Shadow public abstract int getExperience();
-
 	public ZombieVillagerEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
-
+	@SuppressWarnings("AddedMixinMembersNamePattern")
 	public VillagerGossips GetGossip() { return this.gossip; }
+	@SuppressWarnings("AddedMixinMembersNamePattern")
 	public TradeOfferList GetOfferData() { return this.offerData; }
-
 	@Inject(method="canConvertInWater", at=@At("HEAD"), cancellable=true)
 	private void AllowConversionInWater(CallbackInfoReturnable<Boolean> cir) { cir.setReturnValue(true); }
-
 	@Override
 	protected void convertInWater() {
 		this.ConvertToDrownedVillagerEntity();
@@ -45,8 +43,6 @@ public abstract class ZombieVillagerEntityMixin extends ZombieEntity implements 
 			this.getEntityWorld().syncWorldEvent(null, WorldEvents.ZOMBIE_CONVERTS_TO_DROWNED, this.getBlockPos(), 0);
 		}
 	}
-
-
 	@Unique
 	protected void ConvertToDrownedVillagerEntity() {
 		this.convertTo((EntityType<? extends DrownedVillagerEntity>) ZombieVillagerVariants.DROWNED_VILLAGER, EntityConversionContext.create(this, true, true), zombieVillager -> {
@@ -57,9 +53,7 @@ public abstract class ZombieVillagerEntityMixin extends ZombieEntity implements 
 			if (this.gossip != null) zombieVillager.setGossip(this.gossip.copy());
 			if (this.offerData != null) zombieVillager.setOfferData(this.offerData.copy());
 			zombieVillager.setExperience(this.getExperience());
-			if (!this.isSilent()) {
-				world.syncWorldEvent(null, WorldEvents.ZOMBIE_INFECTS_VILLAGER, this.getBlockPos(), 0);
-			}
+			if (!this.isSilent()) world.syncWorldEvent(null, WorldEvents.ZOMBIE_INFECTS_VILLAGER, this.getBlockPos(), 0);
 		});
 	}
 }

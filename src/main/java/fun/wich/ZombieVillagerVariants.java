@@ -18,23 +18,15 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.SpawnSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Function;
 
 public class ZombieVillagerVariants implements ModInitializer {
 	public static final String MOD_ID = "wich";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	//Drowned Villager
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_AMBIENT = register("entity.drowned_villager.ambient");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_AMBIENT_WATER = register("entity.drowned_villager.ambient_water");
-	public static final SoundEvent ENTITY_DROWNED_VILLAGER_CONVERTED = register("entity.drowned_villager.converted");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_CURE = register("entity.drowned_villager.cure");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_DEATH = register("entity.drowned_villager.death");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_DEATH_WATER = register("entity.drowned_villager.death_water");
@@ -45,8 +37,6 @@ public class ZombieVillagerVariants implements ModInitializer {
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_SWIM = register("entity.drowned_villager.swim");
 	//Villager Husk
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_AMBIENT = register("entity.villager_husk.ambient");
-	public static final SoundEvent ENTITY_VILLAGER_HUSK_CONVERTED = register("entity.villager_husk.converted");
-	public static final SoundEvent ENTITY_VILLAGER_HUSK_CONVERTED_TO_ZOMBIE = register("entity.villager_husk.converted_to_zombie");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_CURE = register("entity.villager_husk.cure");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_DEATH = register("entity.villager_husk.death");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_HURT = register("entity.villager_husk.hurt");

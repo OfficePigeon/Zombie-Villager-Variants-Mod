@@ -1,5 +1,4 @@
 {
-  
   "entity.drowned_villager.ambient": {
 	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
 	"subtitle": "subtitles.entity.drowned_villager.ambient"
@@ -7,10 +6,6 @@
   "entity.drowned_villager.ambient_water": {
 	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
 	"subtitle": "subtitles.entity.drowned_villager.ambient_water"
-  },
-  "entity.drowned_villager.converted": {
-	"sounds": [ "mob/zombie/unfect" ],
-	"subtitle": "subtitles.entity.drowned_villager.converted"
   },
   "entity.drowned_villager.cure": {
 	"sounds": [ "mob/zombie/remedy" ],
@@ -50,22 +45,9 @@
 	"subtitle": "subtitles.entity.parrot.imitate.drowned_villager"
   },
   
-  
-  
   "entity.villager_husk.ambient": {
 	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
 	"subtitle": "subtitles.entity.villager_husk.ambient"
-  },
-  "entity.villager_husk.converted_to_zombie": {
-	"sounds": [
-	  { "name": "mob/husk/convert1", "volume": 0.8 },
-	  { "name": "mob/husk/convert2", "volume": 0.8 }
-	],
-	"subtitle": "subtitles.entity.villager_husk.converted_to_zombie"
-  },
-  "entity.villager_husk.converted": {
-	"sounds": [ "mob/zombie/unfect" ],
-	"subtitle": "subtitles.entity.villager_husk.converted"
   },
   "entity.villager_husk.cure": {
 	"sounds": [ "mob/zombie/remedy" ],

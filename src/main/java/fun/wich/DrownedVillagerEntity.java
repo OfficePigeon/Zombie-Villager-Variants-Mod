@@ -61,10 +61,8 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 	@Nullable
 	private TradeOfferList offerData;
 	private int experience = DEFAULT_EXPERIENCE;
-
 	public DrownedVillagerEntity(EntityType<? extends DrownedEntity> entityType, World world) { super(entityType, world); }
-
-	public static boolean canDrownedVillagerSpawn(EntityType<DrownedVillagerEntity> type, ServerWorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+	public static boolean canDrownedVillagerSpawn(EntityType<DrownedVillagerEntity> ignoredType, ServerWorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
 		if (!world.getFluidState(pos.down()).isIn(FluidTags.WATER) && !SpawnReason.isAnySpawner(spawnReason)) return false;
 		else {
 			RegistryEntry<Biome> registryEntry = world.getBiome(pos);
@@ -76,10 +74,7 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 			else return true;
 		}
 	}
-	public static boolean isValidSpawnDepth(WorldAccess world, BlockPos pos) {
-		return pos.getY() < world.getSeaLevel() - 5;
-	}
-
+	public static boolean isValidSpawnDepth(WorldAccess world, BlockPos pos) { return pos.getY() < world.getSeaLevel() - 5; }
 	protected void initDataTracker(DataTracker.Builder builder) {
 		super.initDataTracker(builder);
 		builder.add(CONVERTING, false);
@@ -179,7 +174,6 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 			if (!this.isSilent()) world.syncWorldEvent(null, 1027, this.getBlockPos(), 0);
 		});
 	}
-	public void setConversionTimer(int conversionTimer) { this.conversionTimer = conversionTimer; }
 	private int getConversionRate() {
 		int i = 1;
 		if (this.random.nextFloat() < 0.01F) {
@@ -213,9 +207,8 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 	}
 	public SoundEvent getStepSound() { return ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_STEP; }
 	public SoundEvent getSwimSound() { return ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_SWIM; }
-	public void setOfferData(TradeOfferList offerData) { this.offerData = offerData; }
-	public void setGossip(VillagerGossips gossip) { this.gossip = gossip; }
-
+	public void setOfferData(@Nullable TradeOfferList offerData) { this.offerData = offerData; }
+	public void setGossip(@Nullable VillagerGossips gossip) { this.gossip = gossip; }
 	public void shootAt(LivingEntity target, float pullProgress) {
 		ItemStack itemStack = this.getMainHandStack();
 		ItemStack itemStack2 = itemStack.isOf(Items.TRIDENT) ? itemStack : new ItemStack(Items.TRIDENT);
@@ -240,7 +233,6 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 		this.dataTracker.set(VILLAGER_DATA, villagerData);
 	}
 	public VillagerData getVillagerData() { return this.dataTracker.get(VILLAGER_DATA); }
-	public int getExperience() { return this.experience; }
 	public void setExperience(int experience) { this.experience = experience; }
 	@Nullable
 	public <T> T get(ComponentType<? extends T> type) {
@@ -258,7 +250,6 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 		}
 		else return super.setApplicableComponent(type, value);
 	}
-
 	@Override
 	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
 		DrownedVillagerEntity zombieVillagerEntity = villager.convertTo(ZombieVillagerVariants.DROWNED_VILLAGER, EntityConversionContext.create(villager, true, true), zombieVillager -> {

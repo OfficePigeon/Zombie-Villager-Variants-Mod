@@ -11,10 +11,10 @@ import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
 public class ModClient implements ClientModInitializer {
-	public static final EntityModelLayer DROWNED_VILLAGER_OUTER = MakeModelLayer("drowned_villager", "outer");
-	public static final EntityModelLayer DROWNED_VILLAGER_BABY_OUTER = MakeModelLayer("drowned_villager_baby", "outer");
-	private static EntityModelLayer MakeModelLayer(String id, String layer) {
-		return new EntityModelLayer(Identifier.of(ZombieVillagerVariants.MOD_ID, id), layer);
+	public static final EntityModelLayer DROWNED_VILLAGER_OUTER = MakeModelLayer("drowned_villager");
+	public static final EntityModelLayer DROWNED_VILLAGER_BABY_OUTER = MakeModelLayer("drowned_villager_baby");
+	private static EntityModelLayer MakeModelLayer(String id) {
+		return new EntityModelLayer(Identifier.of(ZombieVillagerVariants.MOD_ID, id), "outer");
 	}
 
 	@Override
@@ -22,7 +22,6 @@ public class ModClient implements ClientModInitializer {
 		EntityModelLayerRegistry.registerModelLayer(DROWNED_VILLAGER_OUTER, () -> DilatedZombieVillagerEntityModel.getDilatedTexturedModelData(0.25F));
 		EntityModelLayerRegistry.registerModelLayer(DROWNED_VILLAGER_BABY_OUTER, () -> DilatedZombieVillagerEntityModel.getDilatedTexturedModelData(0.25F).transform(BipedEntityModel.BABY_TRANSFORMER));
 		EntityRendererFactories.register(ZombieVillagerVariants.DROWNED_VILLAGER, DrownedVillagerEntityRenderer::new);
-
 		EntityRendererFactories.register(ZombieVillagerVariants.VILLAGER_HUSK, VillagerHuskEntityRenderer::new);
 	}
 }
