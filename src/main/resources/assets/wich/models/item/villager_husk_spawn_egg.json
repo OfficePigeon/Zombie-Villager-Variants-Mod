@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+	"layer0": "wich:item/villager_husk_spawn_egg"
+  }
+}

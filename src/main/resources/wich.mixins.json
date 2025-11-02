@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "fun.wich.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+	"DefaultBiomeFeaturesMixin",
+	"DrownedEntityMixin",
+	"HuskEntityMixin",
+	"ParrotEntityMixin",
+	"VillagerHostilesSensorMixin",
+	"ZombieVillagerEntityMixin"
+  ],
+  "injectors": {
+	"defaultRequire": 1
+  },
+  "overwrites": {
+	"requireAnnotations": true
+  },
+  "client": [
+	"client.ZombieVillagerEntityRendererMixin"
+  ]
+}

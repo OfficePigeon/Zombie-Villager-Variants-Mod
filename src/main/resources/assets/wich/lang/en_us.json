@@ -1,0 +1,26 @@
+{
+  "subtitles.entity.zombie_villager.converted_to_drowned_villager": "Zombie Villager converts to Drowned Villager",
+  
+  "entity.wich.drowned_villager": "Drowned Villager",
+  "item.wich.drowned_villager_spawn_egg": "Drowned Villager Spawn Egg",
+  "subtitles.entity.drowned_villager.ambient": "Drowned Villager gurgles",
+  "subtitles.entity.drowned_villager.ambient_water": "Drowned Villager gurgles",
+  "subtitles.entity.drowned_villager.converted": "Drowned Villager vociferates",
+  "subtitles.entity.drowned_villager.cure": "Drowned Villager snuffles",
+  "subtitles.entity.drowned_villager.death": "Drowned Villager dies",
+  "subtitles.entity.drowned_villager.hurt": "Drowned Villager hurts",
+  "subtitles.entity.drowned_villager.shoot": "Drowned Villager throws Trident",
+  "subtitles.entity.drowned_villager.step": "Drowned Villager steps",
+  "subtitles.entity.drowned_villager.swim": "Drowned Villager swims",
+  "subtitles.entity.parrot.imitate.drowned_villager": "Parrot gurgles",
+  
+  "entity.wich.villager_husk": "Villager Husk",
+  "item.wich.villager_husk_spawn_egg": "Villager Husk Spawn Egg",
+  "subtitles.entity.villager_husk.ambient": "Villager Husk groans",
+  "subtitles.entity.villager_husk.converted_to_zombie_villager": "Villager Husk converts to Zombie Villager",
+  "subtitles.entity.villager_husk.converted": "Villager Husk vociferates",
+  "subtitles.entity.villager_husk.cure": "Villager Husk snuffles",
+  "subtitles.entity.villager_husk.death": "Villager Husk dies",
+  "subtitles.entity.villager_husk.hurt": "Villager Husk hurts",
+  "subtitles.entity.parrot.imitate.villager_husk": "Parrot groans"
+}

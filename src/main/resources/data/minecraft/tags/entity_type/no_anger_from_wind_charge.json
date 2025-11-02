@@ -1,0 +1,6 @@
+{
+  "replace": false,
+  "values": [
+	{ "id": "wich:villager_husk", "required": false }
+  ]
+}

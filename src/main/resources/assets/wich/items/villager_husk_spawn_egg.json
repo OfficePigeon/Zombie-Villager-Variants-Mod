@@ -1,0 +1,6 @@
+{
+  "model": {
+	"type": "minecraft:model",
+	"model": "wich:item/villager_husk_spawn_egg"
+  }
+}

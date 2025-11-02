@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "wich",
+	"version": "${version}",
+	"name": "Zombie Villager Variants",
+	"description": "Drowned and Husk variants of Zombie Villagers",
+	"authors": [ "dovewich" ],
+	"contact": {
+		"homepage": "https://www.wich.fun/",
+		"sources": "https://github.com/OfficePigeon/Zombie-Villager-Variants-Mod"
+	},
+	"license": "",
+	"icon": "assets/wich/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [ "fun.wich.ZombieVillagerVariants" ],
+		"client": [ "fun.wich.client.ModClient" ]
+	},
+	"mixins": [
+		"wich.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": ">=1.21.9",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

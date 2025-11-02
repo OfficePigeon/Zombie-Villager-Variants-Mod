@@ -1,0 +1,6 @@
+{
+  "replace": false,
+  "values": [
+	{ "id": "wich:drowned_villager", "required": false }
+  ]
+}
