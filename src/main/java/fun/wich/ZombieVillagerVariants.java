@@ -23,7 +23,6 @@ import java.util.function.Function;
 
 public class ZombieVillagerVariants implements ModInitializer {
 	public static final String MOD_ID = "wich";
-
 	//Drowned Villager
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_AMBIENT = register("entity.drowned_villager.ambient");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_AMBIENT_WATER = register("entity.drowned_villager.ambient_water");
@@ -46,7 +45,7 @@ public class ZombieVillagerVariants implements ModInitializer {
 	public static final SoundEvent ENTITY_PARROT_IMITATE_VILLAGER_HUSK = register("entity.parrot.imitate.villager_husk");
 
 	private static SoundEvent register(String path) {
-		Identifier id = Identifier.of(ZombieVillagerVariants.MOD_ID, path);
+		Identifier id = Identifier.of(MOD_ID, path);
 		return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
 	}
 
