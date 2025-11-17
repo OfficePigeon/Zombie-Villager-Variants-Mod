@@ -20,8 +20,8 @@ public class DrownedVillagerOverlayFeatureRenderer extends FeatureRenderer<Zombi
 
 	public DrownedVillagerOverlayFeatureRenderer(FeatureRendererContext<ZombieVillagerRenderState, ZombieVillagerEntityModel<ZombieVillagerRenderState>> context, LoadedEntityModels loader) {
 		super(context);
-		this.model = new DilatedZombieVillagerEntityModel(loader.getModelPart(ModClient.DROWNED_VILLAGER_OUTER));
-		this.babyModel = new DilatedZombieVillagerEntityModel(loader.getModelPart(ModClient.DROWNED_VILLAGER_BABY_OUTER));
+		this.model = new DilatedZombieVillagerEntityModel(loader.getModelPart(ZombieVillagerVariantsClient.DROWNED_VILLAGER_OUTER));
+		this.babyModel = new DilatedZombieVillagerEntityModel(loader.getModelPart(ZombieVillagerVariantsClient.DROWNED_VILLAGER_BABY_OUTER));
 	}
 
 	@Override

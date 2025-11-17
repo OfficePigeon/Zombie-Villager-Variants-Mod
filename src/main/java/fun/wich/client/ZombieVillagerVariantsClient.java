@@ -10,7 +10,7 @@ import net.minecraft.client.render.entity.model.*;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
-public class ModClient implements ClientModInitializer {
+public class ZombieVillagerVariantsClient implements ClientModInitializer {
 	public static final EntityModelLayer DROWNED_VILLAGER_OUTER = MakeModelLayer("drowned_villager");
 	public static final EntityModelLayer DROWNED_VILLAGER_BABY_OUTER = MakeModelLayer("drowned_villager_baby");
 	private static EntityModelLayer MakeModelLayer(String id) {
