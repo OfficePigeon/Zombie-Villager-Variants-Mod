@@ -1,0 +1,28 @@
+{
+  "subtitles.entity.zombie_villager.converted_to_drowned_villager": "Зомбоселянин перетворюється на потопельника",
+  
+  "entity.wich.drowned_villager": "Селянин-потопельник",
+  "item.wich.drowned_villager_spawn_egg": "Яйце виклику селянина-потопельника",
+  "subtitles.entity.drowned_villager.ambient": "Селянин-потопельник булькає",
+  "subtitles.entity.drowned_villager.ambient_water": "Селянин-потопельник булькає",
+  "subtitles.entity.drowned_villager.converted": "Селянин-потопельник кричить",
+  "subtitles.entity.drowned_villager.cure": "Селянин-потопельник сопе",
+  "subtitles.entity.drowned_villager.death": "Селянин-потопельник гине",
+  "subtitles.entity.drowned_villager.hurt": "Селянина-потопельника поранено",
+  "subtitles.entity.drowned_villager.shoot": "Селянин-потопельник кидає тризубець",
+  "subtitles.entity.drowned_villager.step": "Селянин-потопельник крокує",
+  "subtitles.entity.drowned_villager.swim": "Селянин-потопельник пливе",
+  "subtitles.entity.parrot.imitate.drowned_villager": "Папуга булькає",
+  
+  "entity.wich.villager_husk": "Селянин-висушень",
+  "item.wich.villager_husk_spawn_egg": "Яйце виклику селянина-висушня",
+  "subtitles.entity.villager_husk.ambient": "Villager Husk стогне",
+  "subtitles.entity.villager_husk.converted_to_zombie_villager": "Селянин-висушень перетворюється на зомбоселянина",
+  "subtitles.entity.villager_husk.converted": "Селянин-висушень кричить",
+  "subtitles.entity.villager_husk.cure": "Селянин-висушень сопе",
+  "subtitles.entity.villager_husk.death": "Селянин-висушень гине",
+  "subtitles.entity.villager_husk.hurt": "Селянина-висушня поранено",
+  "subtitles.entity.parrot.imitate.villager_husk": "Папуга стогне",
+  
+  "modmenu.descriptionTranslation.wich_zombie-villager-variants": "Варіанти потопельника та висушня для зомбоселян."
+}
