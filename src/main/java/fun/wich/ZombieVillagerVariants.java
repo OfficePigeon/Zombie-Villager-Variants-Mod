@@ -1,28 +1,38 @@
 package fun.wich;
 
+import fun.wich.mixin.LootTablesMixin;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 
 import java.util.function.Function;
 
 public class ZombieVillagerVariants implements ModInitializer {
 	public static final String MOD_ID = "wich";
+	private static boolean IsModLoaded(String id) { return FabricLoader.getInstance().isModLoaded(id); }
+	public static boolean FrozenZombiesDefined() { return IsModLoaded(MOD_ID + "_frozen-zombies"); }
+	public static boolean JungleZombiesDefined() { return IsModLoaded(MOD_ID + "_jungle-zombies"); }
+	public static boolean LobberZombiesDefined() { return IsModLoaded(MOD_ID + "_lobber-zombies"); }
+	public static boolean BoulderingZombiesDefined() { return IsModLoaded(MOD_ID + "_bouldering-zombies"); }
 	//Drowned Villager
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_AMBIENT = register("entity.drowned_villager.ambient");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_AMBIENT_WATER = register("entity.drowned_villager.ambient_water");
@@ -34,20 +44,58 @@ public class ZombieVillagerVariants implements ModInitializer {
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_SHOOT = register("entity.drowned_villager.shoot");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_STEP = register("entity.drowned_villager.step");
 	public static final SoundEvent ENTITY_DROWNED_VILLAGER_SWIM = register("entity.drowned_villager.swim");
+	public static final SoundEvent ENTITY_ZOMBIE_VILLAGER_CONVERTED_TO_DROWNED_VILLAGER = register("entity.zombie_villager.converted_to_drowned_villager");
+	public static final SoundEvent ENTITY_PARROT_IMITATE_DROWNED_VILLAGER = register("entity.parrot.imitate.drowned_villager");
 	//Villager Husk
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_AMBIENT = register("entity.villager_husk.ambient");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_CURE = register("entity.villager_husk.cure");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_DEATH = register("entity.villager_husk.death");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_HURT = register("entity.villager_husk.hurt");
 	public static final SoundEvent ENTITY_VILLAGER_HUSK_STEP = register("entity.villager_husk.step");
-	//Parrot Imitations
-	public static final SoundEvent ENTITY_PARROT_IMITATE_DROWNED_VILLAGER = register("entity.parrot.imitate.drowned_villager");
+	public static final SoundEvent ENTITY_VILLAGER_HUSK_CONVERTED_TO_ZOMBIE_VILLAGER = register("entity.villager_husk.converted_to_zombie_villager");
 	public static final SoundEvent ENTITY_PARROT_IMITATE_VILLAGER_HUSK = register("entity.parrot.imitate.villager_husk");
-
-	private static SoundEvent register(String path) {
+	//Bouldering Zombie Villager
+	public static final SoundEvent ENTITY_BOULDERING_ZOMBIE_VILLAGER_AMBIENT = ZombieVillagerVariants.register("entity.bouldering_zombie_villager.ambient");
+	public static final SoundEvent ENTITY_BOULDERING_ZOMBIE_VILLAGER_CURE = ZombieVillagerVariants.register("entity.bouldering_zombie_villager.cure");
+	public static final SoundEvent ENTITY_BOULDERING_ZOMBIE_VILLAGER_DEATH = ZombieVillagerVariants.register("entity.bouldering_zombie_villager.death");
+	public static final SoundEvent ENTITY_BOULDERING_ZOMBIE_VILLAGER_HURT = ZombieVillagerVariants.register("entity.bouldering_zombie_villager.hurt");
+	public static final SoundEvent ENTITY_BOULDERING_ZOMBIE_VILLAGER_STEP = ZombieVillagerVariants.register("entity.bouldering_zombie_villager.step");
+	public static final SoundEvent ENTITY_BOULDERING_ZOMBIE_VILLAGER_CLIMB = ZombieVillagerVariants.register("entity.bouldering_zombie_villager.climb");
+	public static final SoundEvent ENTITY_PARROT_IMITATE_BOULDERING_ZOMBIE_VILLAGER = register("entity.parrot.imitate.bouldering_zombie_villager");
+	//Frozen Zombie Villager
+	public static final SoundEvent ENTITY_FROZEN_ZOMBIE_VILLAGER_AMBIENT = ZombieVillagerVariants.register("entity.frozen_zombie_villager.ambient");
+	public static final SoundEvent ENTITY_FROZEN_ZOMBIE_VILLAGER_CURE = ZombieVillagerVariants.register("entity.frozen_zombie_villager.cure");
+	public static final SoundEvent ENTITY_FROZEN_ZOMBIE_VILLAGER_DEATH = ZombieVillagerVariants.register("entity.frozen_zombie_villager.death");
+	public static final SoundEvent ENTITY_FROZEN_ZOMBIE_VILLAGER_HURT = ZombieVillagerVariants.register("entity.frozen_zombie_villager.hurt");
+	public static final SoundEvent ENTITY_FROZEN_ZOMBIE_VILLAGER_STEP = ZombieVillagerVariants.register("entity.frozen_zombie_villager.step");
+	public static final SoundEvent ENTITY_ZOMBIE_VILLAGER_CONVERTED_TO_FROZEN_ZOMBIE_VILLAGER = register("entity.zombie_villager.converted_to_frozen_zombie_villager");
+	public static final SoundEvent ENTITY_FROZEN_ZOMBIE_VILLAGER_CONVERTED_TO_ZOMBIE_VILLAGER = register("entity.frozen_zombie_villager.converted_to_zombie_villager");
+	public static final SoundEvent ENTITY_PARROT_IMITATE_FROZEN_ZOMBIE_VILLAGER = register("entity.parrot.imitate.frozen_zombie_villager");
+	//Jungle Zombie Villager
+	public static final SoundEvent ENTITY_JUNGLE_ZOMBIE_VILLAGER_AMBIENT = ZombieVillagerVariants.register("entity.jungle_zombie_villager.ambient");
+	public static final SoundEvent ENTITY_JUNGLE_ZOMBIE_VILLAGER_CURE = ZombieVillagerVariants.register("entity.jungle_zombie_villager.cure");
+	public static final SoundEvent ENTITY_JUNGLE_ZOMBIE_VILLAGER_DEATH = ZombieVillagerVariants.register("entity.jungle_zombie_villager.death");
+	public static final SoundEvent ENTITY_JUNGLE_ZOMBIE_VILLAGER_HURT = ZombieVillagerVariants.register("entity.jungle_zombie_villager.hurt");
+	public static final SoundEvent ENTITY_JUNGLE_ZOMBIE_VILLAGER_STEP = ZombieVillagerVariants.register("entity.jungle_zombie_villager.step");
+	public static final SoundEvent ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR = ZombieVillagerVariants.register("entity.jungle_zombie_villager.shear");
+	public static final SoundEvent ENTITY_PARROT_IMITATE_JUNGLE_ZOMBIE_VILLAGER = register("entity.parrot.imitate.jungle_zombie_villager");
+	//Lobber Zombie Villager
+	public static final SoundEvent ENTITY_LOBBER_ZOMBIE_VILLAGER_AMBIENT = ZombieVillagerVariants.register("entity.lobber_zombie_villager.ambient");
+	public static final SoundEvent ENTITY_LOBBER_ZOMBIE_VILLAGER_CURE = ZombieVillagerVariants.register("entity.lobber_zombie_villager.cure");
+	public static final SoundEvent ENTITY_LOBBER_ZOMBIE_VILLAGER_DEATH = ZombieVillagerVariants.register("entity.lobber_zombie_villager.death");
+	public static final SoundEvent ENTITY_LOBBER_ZOMBIE_VILLAGER_HURT = ZombieVillagerVariants.register("entity.lobber_zombie_villager.hurt");
+	public static final SoundEvent ENTITY_LOBBER_ZOMBIE_VILLAGER_STEP = ZombieVillagerVariants.register("entity.lobber_zombie_villager.step");
+	public static final SoundEvent ENTITY_LOBBER_ZOMBIE_VILLAGER_THROW = ZombieVillagerVariants.register("entity.lobber_zombie_villager.throw");
+	public static final SoundEvent ENTITY_PARROT_IMITATE_LOBBER_ZOMBIE_VILLAGER = register("entity.parrot.imitate.lobber_zombie_villager");
+	public static SoundEvent register(String path) {
 		Identifier id = Identifier.of(MOD_ID, path);
 		return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
 	}
+
+	public static final TagKey<Biome> TAG_SPAWNS_BOULDERING_ZOMBIES = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "spawns_bouldering_zombies"));
+	public static final TagKey<Biome> TAG_SPAWNS_FROZEN_ZOMBIES = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "spawns_frozen_zombies"));
+	public static final TagKey<Biome> TAG_SPAWNS_JUNGLE_ZOMBIES = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "spawns_jungle_zombies"));
+	public static final TagKey<Biome> TAG_SPAWNS_LOBBER_ZOMBIES = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "spawns_lobber_zombies"));
 
 	public static final EntityType<DrownedVillagerEntity> DROWNED_VILLAGER = register(
 			"drowned_villager",
@@ -69,22 +117,82 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.maxTrackingRange(8)
 					.notAllowedInPeaceful()
 	);
-	private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> type) {
+	public static final EntityType<BoulderingZombieVillagerEntity> BOULDERING_ZOMBIE_VILLAGER = register(
+			"bouldering_zombie_villager",
+			EntityType.Builder.create(BoulderingZombieVillagerEntity::new, SpawnGroup.MONSTER)
+					.dimensions(0.6F, 1.95F)
+					.passengerAttachments(2.125F)
+					.vehicleAttachment(-0.7F)
+					.eyeHeight(1.74F)
+					.maxTrackingRange(8)
+					.notAllowedInPeaceful()
+	);
+	public static final EntityType<FrozenZombieVillagerEntity> FROZEN_ZOMBIE_VILLAGER = register(
+			"frozen_zombie_villager",
+			EntityType.Builder.create(FrozenZombieVillagerEntity::new, SpawnGroup.MONSTER)
+					.dimensions(0.6F, 1.95F)
+					.passengerAttachments(2.125F)
+					.vehicleAttachment(-0.7F)
+					.eyeHeight(1.74F)
+					.maxTrackingRange(8)
+					.notAllowedInPeaceful()
+	);
+	public static final EntityType<FrozenZombieVillagerSnowballEntity> FROZEN_ZOMBIE_VILLAGER_SNOWBALL = register(
+			"frozen_zombie_villager_snowball",
+			EntityType.Builder.<FrozenZombieVillagerSnowballEntity>create(FrozenZombieVillagerSnowballEntity::new, SpawnGroup.MISC)
+					.dropsNothing()
+					.dimensions(0.25F, 0.25F)
+					.maxTrackingRange(4)
+					.trackingTickInterval(10)
+	);
+	public static final EntityType<JungleZombieVillagerEntity> JUNGLE_ZOMBIE_VILLAGER = register(
+			"jungle_zombie_villager",
+			EntityType.Builder.create(JungleZombieVillagerEntity::new, SpawnGroup.MONSTER)
+					.dimensions(0.6F, 1.95F)
+					.passengerAttachments(2.125F)
+					.vehicleAttachment(-0.7F)
+					.eyeHeight(1.74F)
+					.maxTrackingRange(8)
+					.notAllowedInPeaceful()
+	);
+	public static final EntityType<LobberZombieVillagerEntity> LOBBER_ZOMBIE_VILLAGER = register(
+			"lobber_zombie_villager",
+			EntityType.Builder.create(LobberZombieVillagerEntity::new, SpawnGroup.MONSTER)
+					.dimensions(0.6F, 1.95F)
+					.passengerAttachments(2.125F)
+					.vehicleAttachment(-0.7F)
+					.eyeHeight(1.74F)
+					.maxTrackingRange(8)
+					.notAllowedInPeaceful()
+	);
+	public static final EntityType<LobberZombieVillagerThrownFleshEntity> LOBBER_ZOMBIE_VILLAGER_THROWN_FLESH = register(
+			"lobber_zombie_villager_thrown_flesh",
+			EntityType.Builder.<LobberZombieVillagerThrownFleshEntity>create(LobberZombieVillagerThrownFleshEntity::new, SpawnGroup.MISC)
+					.dropsNothing()
+					.dimensions(0.25F, 0.25F)
+					.maxTrackingRange(4)
+					.trackingTickInterval(10)
+	);
+	public static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> type) {
 		RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, name));
 		EntityType<T> entityType = type.build(key);
 		Registry.register(Registries.ENTITY_TYPE, key, entityType);
 		return entityType;
 	}
 
-
 	public static final Item DROWNED_VILLAGER_SPAWN_EGG = register("drowned_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(DROWNED_VILLAGER));
 	public static final Item VILLAGER_HUSK_SPAWN_EGG = register("villager_husk_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(VILLAGER_HUSK));
+	public static final Item BOULDERING_ZOMBIE_VILLAGER_SPAWN_EGG = register("bouldering_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(BOULDERING_ZOMBIE_VILLAGER));
+	public static final Item FROZEN_ZOMBIE_VILLAGER_SPAWN_EGG = register("frozen_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(FROZEN_ZOMBIE_VILLAGER));
+	public static final Item JUNGLE_ZOMBIE_VILLAGER_SPAWN_EGG = register("jungle_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(JUNGLE_ZOMBIE_VILLAGER));
+	public static final Item LOBBER_ZOMBIE_VILLAGER_SPAWN_EGG = register("lobber_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(LOBBER_ZOMBIE_VILLAGER));
 	public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
 		RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, name));
 		Item item = itemFactory.apply(settings.registryKey(key));
 		Registry.register(Registries.ITEM, key, item);
 		return item;
 	}
+	public static final RegistryKey<LootTable> JUNGLE_ZOMBIE_VILLAGER_SHEARING = LootTablesMixin.registerLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(MOD_ID, "shearing/jungle_zombie_villager")));
 
 	@Override
 	public void onInitialize() {
@@ -119,5 +227,61 @@ public class ZombieVillagerVariants implements ModInitializer {
 				SpawnGroup.MONSTER, VILLAGER_HUSK, 4, 1, 1);
 		//Items
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(itemGroup -> itemGroup.add(VILLAGER_HUSK_SPAWN_EGG));
+
+		//#########################################
+		//#                                       #
+		//#      Bouldering Zombie Villager       #
+		//#                                       #
+		//#########################################
+		//Attributes
+		FabricDefaultAttributeRegistry.register(BOULDERING_ZOMBIE_VILLAGER, BoulderingZombieVillagerEntity.createZombieAttributes());
+		//Spawning
+		SpawnRestriction.register(BOULDERING_ZOMBIE_VILLAGER, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, BoulderingZombieVillagerEntity::canSpawnInDark);
+		BiomeModifications.addSpawn(BiomeSelectors.tag(TAG_SPAWNS_BOULDERING_ZOMBIES), //Tag will be empty if bouldering zombies are not defined
+				SpawnGroup.MONSTER, BOULDERING_ZOMBIE_VILLAGER, 2, 1, 1);
+		//Items
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(itemGroup -> itemGroup.add(BOULDERING_ZOMBIE_VILLAGER_SPAWN_EGG));
+
+		//#########################################
+		//#                                       #
+		//#        Frozen Zombie Villager         #
+		//#                                       #
+		//#########################################
+		//Attributes
+		FabricDefaultAttributeRegistry.register(FROZEN_ZOMBIE_VILLAGER, FrozenZombieVillagerEntity.createZombieAttributes());
+		//Spawning
+		SpawnRestriction.register(FROZEN_ZOMBIE_VILLAGER, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, FrozenZombieVillagerEntity::canSpawn);
+			BiomeModifications.addSpawn(BiomeSelectors.tag(TAG_SPAWNS_FROZEN_ZOMBIES), //Tag will be empty if frozen zombies are not defined
+					SpawnGroup.MONSTER, FROZEN_ZOMBIE_VILLAGER, 4, 1, 1);
+		//Items
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(itemGroup -> itemGroup.add(FROZEN_ZOMBIE_VILLAGER_SPAWN_EGG));
+
+		//#########################################
+		//#                                       #
+		//#        Jungle Zombie Villager         #
+		//#                                       #
+		//#########################################
+		//Attributes
+		FabricDefaultAttributeRegistry.register(JUNGLE_ZOMBIE_VILLAGER, FrozenZombieVillagerEntity.createZombieAttributes());
+		//Spawning
+		SpawnRestriction.register(JUNGLE_ZOMBIE_VILLAGER, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, FrozenZombieVillagerEntity::canSpawnInDark);
+		BiomeModifications.addSpawn(BiomeSelectors.tag(TAG_SPAWNS_JUNGLE_ZOMBIES), //Tag will be empty if jungle zombies are not defined
+				SpawnGroup.MONSTER, JUNGLE_ZOMBIE_VILLAGER, 4, 1, 1);
+		//Items
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(itemGroup -> itemGroup.add(JUNGLE_ZOMBIE_VILLAGER_SPAWN_EGG));
+
+		//#########################################
+		//#                                       #
+		//#        Lobber Zombie Villager         #
+		//#                                       #
+		//#########################################
+		//Attributes
+		FabricDefaultAttributeRegistry.register(LOBBER_ZOMBIE_VILLAGER, LobberZombieVillagerEntity.createZombieAttributes());
+		//Spawning
+		SpawnRestriction.register(LOBBER_ZOMBIE_VILLAGER, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, LobberZombieVillagerEntity::canSpawnInDark);
+		BiomeModifications.addSpawn(BiomeSelectors.tag(TAG_SPAWNS_LOBBER_ZOMBIES), //Tag will be empty if lobber zombies are not defined
+				SpawnGroup.MONSTER, LOBBER_ZOMBIE_VILLAGER, 2, 1, 1);
+		//Items
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(itemGroup -> itemGroup.add(LOBBER_ZOMBIE_VILLAGER_SPAWN_EGG));
 	}
 }

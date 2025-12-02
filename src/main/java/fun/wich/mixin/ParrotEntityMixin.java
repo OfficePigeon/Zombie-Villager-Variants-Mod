@@ -31,7 +31,11 @@ public class ParrotEntityMixin {
 			EntityType<?> type = mobEntity.getType();
 			if (!MOB_SOUNDS.containsKey(type)) {
 				if (type == ZombieVillagerVariants.DROWNED_VILLAGER) MOB_SOUNDS.put(ZombieVillagerVariants.DROWNED_VILLAGER, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_DROWNED_VILLAGER);
-				if (type == ZombieVillagerVariants.VILLAGER_HUSK) MOB_SOUNDS.put(ZombieVillagerVariants.VILLAGER_HUSK, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_VILLAGER_HUSK);
+				else if (type == ZombieVillagerVariants.VILLAGER_HUSK) MOB_SOUNDS.put(ZombieVillagerVariants.VILLAGER_HUSK, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_VILLAGER_HUSK);
+				else if (type == ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER) MOB_SOUNDS.put(ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_FROZEN_ZOMBIE_VILLAGER);
+				else if (type == ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER) MOB_SOUNDS.put(ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_JUNGLE_ZOMBIE_VILLAGER);
+				else if (type == ZombieVillagerVariants.LOBBER_ZOMBIE_VILLAGER) MOB_SOUNDS.put(ZombieVillagerVariants.LOBBER_ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_LOBBER_ZOMBIE_VILLAGER);
+				else if (type == ZombieVillagerVariants.BOULDERING_ZOMBIE_VILLAGER) MOB_SOUNDS.put(ZombieVillagerVariants.BOULDERING_ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_PARROT_IMITATE_BOULDERING_ZOMBIE_VILLAGER);
 			}
 			return MOB_SOUNDS.containsKey(type);
 		}

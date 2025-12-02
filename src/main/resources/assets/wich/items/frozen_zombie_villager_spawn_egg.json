@@ -1,0 +1,6 @@
+{
+  "model": {
+	"type": "minecraft:model",
+	"model": "wich:item/frozen_zombie_villager_spawn_egg"
+  }
+}

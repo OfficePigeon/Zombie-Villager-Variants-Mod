@@ -14,9 +14,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [ "fun.wich.ZombieVillagerVariants" ],
-		"client": [
-		  "fun.wich.client.ZombieVillagerVariantsClient"
-		]
+		"client": [ "fun.wich.client.ZombieVillagerVariantsClient" ]
 	},
 	"mixins": [
 		"wich.zombievillagervariants.mixins.json"

@@ -1,67 +1,82 @@
 package fun.wich;
 
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.EnchantmentEffectComponentTypes;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
-import net.minecraft.entity.conversion.EntityConversionContext;
+import net.minecraft.entity.ai.NoPenaltyTargeting;
+import net.minecraft.entity.ai.RangedAttackMob;
+import net.minecraft.entity.ai.control.MoveControl;
+import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.pathing.AmphibiousSwimNavigation;
+import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.DrownedEntity;
-import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.AxolotlEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.passive.MerchantEntity;
+import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.inventory.StackReference;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.village.*;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.EnumSet;
 
-public class DrownedVillagerEntity extends DrownedEntity implements VillagerDataContainer {
-	private static final TrackedData<Boolean> CONVERTING = DataTracker.registerData(DrownedVillagerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-	private static final TrackedData<VillagerData> VILLAGER_DATA = DataTracker.registerData(DrownedVillagerEntity.class, TrackedDataHandlerRegistry.VILLAGER_DATA);
-	private static final int BASE_CONVERSION_DELAY = 3600;
-	private static final int DEFAULT_CONVERSION_TIME = -1;
-	private static final int DEFAULT_EXPERIENCE = 0;
-	private int conversionTimer;
-	@Nullable
-	private UUID converter;
-	@Nullable
-	private VillagerGossips gossip;
-	@Nullable
-	private TradeOfferList offerData;
-	private int experience = DEFAULT_EXPERIENCE;
-	public DrownedVillagerEntity(EntityType<? extends DrownedEntity> entityType, World world) { super(entityType, world); }
+public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implements RangedAttackMob {
+	protected boolean targetingUnderwater;
+	public DrownedVillagerEntity(EntityType<? extends ZombieVillagerEntity> entityType, World world) {
+		super(entityType, world);
+		this.moveControl = new DrownedMoveControl(this);
+	}
+	public static DefaultAttributeContainer.Builder createDrownedAttributes() {
+		return createZombieAttributes().add(EntityAttributes.STEP_HEIGHT, 1.0);
+	}
+	@Override
+	protected EntityNavigation createNavigation(World world) {
+		return new AmphibiousSwimNavigation(this, world);
+	}
+	@Override
+	protected void initCustomGoals() {
+		this.goalSelector.add(1, new WanderAroundOnSurfaceGoal(this, 1.0));
+		this.goalSelector.add(2, new TridentAttackGoal(this, 1.0, 40, 10.0f));
+		this.goalSelector.add(2, new DrownedAttackGoal(this, 1.0, false));
+		this.goalSelector.add(5, new LeaveWaterGoal(this, 1.0));
+		this.goalSelector.add(6, new TargetAboveWaterGoal(this, 1.0, this.getEntityWorld().getSeaLevel()));
+		this.goalSelector.add(7, new WanderAroundGoal(this, 1.0));
+		this.targetSelector.add(1, new RevengeGoal(this, DrownedVillagerEntity.class).setGroupRevenge(ZombifiedPiglinEntity.class));
+		this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, false, (target, world) -> this.canDrownedAttackTarget(target)));
+		this.targetSelector.add(3, new ActiveTargetGoal<>(this, MerchantEntity.class, false));
+		this.targetSelector.add(3, new ActiveTargetGoal<>(this, IronGolemEntity.class, true));
+		this.targetSelector.add(3, new ActiveTargetGoal<>(this, AxolotlEntity.class, true, false));
+		this.targetSelector.add(5, new ActiveTargetGoal<>(this, TurtleEntity.class, 10, true, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
+	}
+	@Override
+	public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData) {
+		entityData = super.initialize(world, difficulty, spawnReason, entityData);
+		if (this.getEquippedStack(EquipmentSlot.OFFHAND).isEmpty() && world.getRandom().nextFloat() < 0.03f) {
+			this.equipStack(EquipmentSlot.OFFHAND, new ItemStack(Items.NAUTILUS_SHELL));
+			this.setDropGuaranteed(EquipmentSlot.OFFHAND);
+		}
+		return entityData;
+	}
 	public static boolean canDrownedVillagerSpawn(EntityType<DrownedVillagerEntity> ignoredType, ServerWorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
 		if (!world.getFluidState(pos.down()).isIn(FluidTags.WATER) && !SpawnReason.isAnySpawner(spawnReason)) return false;
 		else {
@@ -74,141 +89,75 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 			else return true;
 		}
 	}
-	public static boolean isValidSpawnDepth(WorldAccess world, BlockPos pos) { return pos.getY() < world.getSeaLevel() - 5; }
-	protected void initDataTracker(DataTracker.Builder builder) {
-		super.initDataTracker(builder);
-		builder.add(CONVERTING, false);
-		builder.add(VILLAGER_DATA, this.createVillagerData());
+	public static boolean isValidSpawnDepth(WorldAccess world, BlockPos pos) {
+		return pos.getY() < world.getSeaLevel() - 5;
 	}
-	protected void writeCustomData(WriteView view) {
-		super.writeCustomData(view);
-		view.put("VillagerData", VillagerData.CODEC, this.getVillagerData());
-		view.putNullable("Offers", TradeOfferList.CODEC, this.offerData);
-		view.putNullable("Gossips", VillagerGossips.CODEC, this.gossip);
-		view.putInt("ConversionTime", this.isConverting() ? this.conversionTimer : DEFAULT_CONVERSION_TIME);
-		view.putNullable("ConversionPlayer", Uuids.INT_STREAM_CODEC, this.converter);
-		view.putInt("Xp", this.experience);
-	}
-	protected void readCustomData(ReadView view) {
-		super.readCustomData(view);
-		this.dataTracker.set(VILLAGER_DATA, view.read("VillagerData", VillagerData.CODEC).orElseGet(this::createVillagerData));
-		this.offerData = view.read("Offers", TradeOfferList.CODEC).orElse(null);
-		this.gossip = view.read("Gossips", VillagerGossips.CODEC).orElse(null);
-		int i = view.getInt("ConversionTime", DEFAULT_CONVERSION_TIME);
-		if (i != DEFAULT_CONVERSION_TIME) {
-			UUID uUID = view.read("ConversionPlayer", Uuids.INT_STREAM_CODEC).orElse(null);
-			this.setConverting(uUID, i);
-		}
-		else {
-			this.getDataTracker().set(CONVERTING, false);
-			this.conversionTimer = DEFAULT_CONVERSION_TIME;
-		}
-		this.experience = view.getInt("Xp", DEFAULT_EXPERIENCE);
-	}
-	private VillagerData createVillagerData() {
-		World world = this.getEntityWorld();
-		Optional<RegistryEntry.Reference<VillagerProfession>> optional = Registries.VILLAGER_PROFESSION.getRandom(this.random);
-		VillagerData villagerData = VillagerEntity.createVillagerData().withType(world.getRegistryManager(), VillagerType.forBiome(world.getBiome(this.getBlockPos())));
-		if (optional.isPresent()) villagerData = villagerData.withProfession(optional.get());
-		return villagerData;
-	}
-	public void tick() {
-		if (!this.getEntityWorld().isClient() && this.isAlive() && this.isConverting()) {
-			int i = this.getConversionRate();
-			this.conversionTimer -= i;
-			if (this.conversionTimer <= 0) this.finishConversion((ServerWorld)this.getEntityWorld());
-		}
-		super.tick();
-	}
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		ItemStack itemStack = player.getStackInHand(hand);
-		if (itemStack.isOf(Items.GOLDEN_APPLE)) {
-			if (this.hasStatusEffect(StatusEffects.WEAKNESS)) {
-				itemStack.decrementUnlessCreative(1, player);
-				if (!this.getEntityWorld().isClient()) this.setConverting(player.getUuid(), this.random.nextInt(2401) + BASE_CONVERSION_DELAY);
-				return ActionResult.SUCCESS_SERVER;
-			}
-			else return ActionResult.CONSUME;
-		}
-		else return super.interactMob(player, hand);
-	}
-	protected boolean canConvertInWater() { return false; } //TODO: Allow standard zombie villagers to convert in water
-	public boolean canImmediatelyDespawn(double distanceSquared) { return !this.isConverting() && this.experience == DEFAULT_EXPERIENCE; }
-	public boolean isConverting() { return this.getDataTracker().get(CONVERTING); }
-	private void setConverting(@Nullable UUID uuid, int delay) {
-		this.converter = uuid;
-		this.conversionTimer = delay;
-		this.getDataTracker().set(CONVERTING, true);
-		this.removeStatusEffect(StatusEffects.WEAKNESS);
-		this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, delay, Math.min(this.getEntityWorld().getDifficulty().getId() - 1, 0)));
-		this.getEntityWorld().sendEntityStatus(this, (byte)16);
-	}
-	public void handleStatus(byte status) {
-		if (status == 16) {
-			if (!this.isSilent()) {
-				this.getEntityWorld().playSoundClient(this.getX(), this.getEyeY(), this.getZ(), ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_CURE, this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F, false);
-			}
-		}
-		else super.handleStatus(status);
-	}
-	private void finishConversion(ServerWorld world) {
-		this.convertTo(EntityType.VILLAGER, EntityConversionContext.create(this, false, false), (villager) -> {
-			for (EquipmentSlot equipmentSlot : this.dropForeignEquipment(world, (stack) -> !EnchantmentHelper.hasAnyEnchantmentsWith(stack, EnchantmentEffectComponentTypes.PREVENT_ARMOR_CHANGE))) {
-				StackReference stackReference = villager.getStackReference(equipmentSlot.getEntitySlotId() + 300);
-				stackReference.set(this.getEquippedStack(equipmentSlot));
-			}
-			villager.setVillagerData(this.getVillagerData());
-			if (this.gossip != null) villager.readGossipData(this.gossip);
-			if (this.offerData != null) villager.setOffers(this.offerData.copy());
-			villager.setExperience(this.experience);
-			villager.initialize(world, world.getLocalDifficulty(villager.getBlockPos()), SpawnReason.CONVERSION, null);
-			villager.reinitializeBrain(world);
-			if (this.converter != null) {
-				PlayerEntity playerEntity = world.getPlayerByUuid(this.converter);
-				if (playerEntity instanceof ServerPlayerEntity) {
-					Criteria.CURED_ZOMBIE_VILLAGER.trigger((ServerPlayerEntity)playerEntity, this, villager);
-					world.handleInteraction(EntityInteraction.ZOMBIE_VILLAGER_CURED, playerEntity, villager);
-				}
-			}
-			villager.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
-			if (!this.isSilent()) world.syncWorldEvent(null, 1027, this.getBlockPos(), 0);
-		});
-	}
-	private int getConversionRate() {
-		int i = 1;
-		if (this.random.nextFloat() < 0.01F) {
-			int j = 0;
-			BlockPos.Mutable mutable = new BlockPos.Mutable();
-			for(int k = (int)this.getX() - 4; k < (int)this.getX() + 4 && j < 14; ++k) {
-				for(int l = (int)this.getY() - 4; l < (int)this.getY() + 4 && j < 14; ++l) {
-					for(int m = (int)this.getZ() - 4; m < (int)this.getZ() + 4 && j < 14; ++m) {
-						BlockState blockState = this.getEntityWorld().getBlockState(mutable.set(k, l, m));
-						if (blockState.isOf(Blocks.IRON_BARS) || blockState.getBlock() instanceof BedBlock) {
-							if (this.random.nextFloat() < 0.3F) ++i;
-							++j;
-						}
-					}
-				}
-			}
-		}
-		return i;
-	}
-	public float getSoundPitch() {
-		return this.isBaby() ? (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 2.0F : (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F;
-	}
+	@Override
+	public SoundEvent GetCureSound() { return ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_CURE; }
+	@Override
 	public SoundEvent getAmbientSound() {
 		return this.isTouchingWater() ? ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_AMBIENT_WATER : ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_AMBIENT;
 	}
+	@Override
 	public SoundEvent getHurtSound(DamageSource source) {
 		return this.isTouchingWater() ? ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_HURT_WATER : ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_HURT;
 	}
+	@Override
 	public SoundEvent getDeathSound() {
 		return this.isTouchingWater() ? ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_DEATH_WATER : ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_DEATH;
 	}
+	@Override
 	public SoundEvent getStepSound() { return ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_STEP; }
+	@Override
 	public SoundEvent getSwimSound() { return ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_SWIM; }
-	public void setOfferData(@Nullable TradeOfferList offerData) { this.offerData = offerData; }
-	public void setGossip(@Nullable VillagerGossips gossip) { this.gossip = gossip; }
+	@Override
+	protected boolean canSpawnAsReinforcementInFluid() { return true; }
+	@Override
+	protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
+		if (random.nextFloat() > 0.9) {
+			if (random.nextInt(16) < 10) this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.TRIDENT));
+			else this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.FISHING_ROD));
+		}
+	}
+	@Override
+	protected boolean prefersNewEquipment(ItemStack newStack, ItemStack currentStack, EquipmentSlot slot) {
+		if (currentStack.isOf(Items.NAUTILUS_SHELL)) return false;
+		return super.prefersNewEquipment(newStack, currentStack, slot);
+	}
+	@Override
+	public boolean canSpawn(WorldView world) { return world.doesNotIntersectEntities(this); }
+	public boolean canDrownedAttackTarget(LivingEntity target) {
+		if (target != null) return !this.getEntityWorld().isDay() || target.isTouchingWater();
+		return false;
+	}
+	@Override
+	public boolean isPushedByFluids() { return !this.isSwimming(); }
+	public boolean isTargetingUnderwater() {
+		if (this.targetingUnderwater) return true;
+		LivingEntity livingEntity = this.getTarget();
+		return livingEntity != null && livingEntity.isTouchingWater();
+	}
+	@Override
+	public void travel(Vec3d movementInput) {
+		if (this.isSubmergedInWater() && this.isTargetingUnderwater()) {
+			this.updateVelocity(0.01f, movementInput);
+			this.move(MovementType.SELF, this.getVelocity());
+			this.setVelocity(this.getVelocity().multiply(0.9));
+		}
+		else super.travel(movementInput);
+	}
+	@Override
+	public void updateSwimming() {
+		if (!this.getEntityWorld().isClient()) this.setSwimming(this.canActVoluntarily() && this.isSubmergedInWater() && this.isTargetingUnderwater());
+	}
+	@Override
+	public boolean isInSwimmingPose() { return this.isSwimming(); }
+	protected boolean hasFinishedCurrentPath() {
+		BlockPos blockPos;
+		Path path = this.getNavigation().getCurrentPath();
+		return path != null && (blockPos = path.getTarget()) != null && (this.squaredDistanceTo(blockPos.getX(), blockPos.getY(), blockPos.getZ())) < 4.0;
+	}
+	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
 		ItemStack itemStack = this.getMainHandStack();
 		ItemStack itemStack2 = itemStack.isOf(Items.TRIDENT) ? itemStack : new ItemStack(Items.TRIDENT);
@@ -217,51 +166,180 @@ public class DrownedVillagerEntity extends DrownedEntity implements VillagerData
 		double e = target.getBodyY(0.3333333333333333) - tridentEntity.getY();
 		double f = target.getZ() - this.getZ();
 		double g = Math.sqrt(d * d + f * f);
-		World var15 = this.getEntityWorld();
-		if (var15 instanceof ServerWorld serverWorld) {
-			ProjectileEntity.spawnWithVelocity(tridentEntity, serverWorld, itemStack2, d, e + g * 0.2, f, 1.6F, (float)(14 - this.getEntityWorld().getDifficulty().getId() * 4));
+		World world = this.getEntityWorld();
+		if (world instanceof ServerWorld serverWorld) {
+			ProjectileEntity.spawnWithVelocity(tridentEntity, serverWorld, itemStack2, d, e + g * 0.2, f, 1.6F, (float)(14 - world.getDifficulty().getId() * 4));
 		}
 		this.playSound(ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
 	}
+	@Override
+	public TagKey<Item> getPreferredWeapons() { return ItemTags.DROWNED_PREFERRED_WEAPONS; }
+	public void setTargetingUnderwater(boolean targetingUnderwater) { this.targetingUnderwater = targetingUnderwater; }
 
-	public void setVillagerData(VillagerData villagerData) {
-		VillagerData villagerData2 = this.getVillagerData();
-		if (!villagerData2.profession().equals(villagerData.profession())) {
-			this.offerData = null;
+	protected static class DrownedMoveControl extends MoveControl {
+		private final DrownedVillagerEntity drowned;
+		public DrownedMoveControl(DrownedVillagerEntity drowned) {
+			super(drowned);
+			this.drowned = drowned;
 		}
-
-		this.dataTracker.set(VILLAGER_DATA, villagerData);
+		@Override
+		public void tick() {
+			LivingEntity livingEntity = this.drowned.getTarget();
+			if (this.drowned.isTargetingUnderwater() && this.drowned.isTouchingWater()) {
+				if (livingEntity != null && livingEntity.getY() > this.drowned.getY() || this.drowned.targetingUnderwater) {
+					this.drowned.setVelocity(this.drowned.getVelocity().add(0.0, 0.002, 0.0));
+				}
+				if (this.state != MoveControl.State.MOVE_TO || this.drowned.getNavigation().isIdle()) {
+					this.drowned.setMovementSpeed(0.0f);
+					return;
+				}
+				double d = this.targetX - this.drowned.getX();
+				double e = this.targetY - this.drowned.getY();
+				double f = this.targetZ - this.drowned.getZ();
+				e /= Math.sqrt(d * d + e * e + f * f);
+				this.drowned.setYaw(this.wrapDegrees(this.drowned.getYaw(), (float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0f, 90.0f));
+				this.drowned.bodyYaw = this.drowned.getYaw();
+				float i = (float)(this.speed * this.drowned.getAttributeValue(EntityAttributes.MOVEMENT_SPEED));
+				float j = MathHelper.lerp(0.125f, this.drowned.getMovementSpeed(), i);
+				this.drowned.setMovementSpeed(j);
+				this.drowned.setVelocity(this.drowned.getVelocity().add(j * d * 0.005, j * e * 0.1, j * f * 0.005));
+			}
+			else {
+				if (!this.drowned.isOnGround()) this.drowned.setVelocity(this.drowned.getVelocity().add(0, -0.008, 0));
+				super.tick();
+			}
+		}
 	}
-	public VillagerData getVillagerData() { return this.dataTracker.get(VILLAGER_DATA); }
-	public void setExperience(int experience) { this.experience = experience; }
-	@Nullable
-	public <T> T get(ComponentType<? extends T> type) {
-		return type == DataComponentTypes.VILLAGER_VARIANT ? castComponentValue(type, this.getVillagerData().type()) : super.get(type);
-	}
-	protected void copyComponentsFrom(ComponentsAccess from) {
-		this.copyComponentFrom(from, DataComponentTypes.VILLAGER_VARIANT);
-		super.copyComponentsFrom(from);
-	}
-	protected <T> boolean setApplicableComponent(ComponentType<T> type, T value) {
-		if (type == DataComponentTypes.VILLAGER_VARIANT) {
-			RegistryEntry<VillagerType> registryEntry = castComponentValue(DataComponentTypes.VILLAGER_VARIANT, value);
-			this.setVillagerData(this.getVillagerData().withType(registryEntry));
+	protected static class WanderAroundOnSurfaceGoal extends Goal {
+		private final PathAwareEntity mob;
+		private double x;
+		private double y;
+		private double z;
+		private final double speed;
+		private final World world;
+		public WanderAroundOnSurfaceGoal(PathAwareEntity mob, double speed) {
+			this.mob = mob;
+			this.speed = speed;
+			this.world = mob.getEntityWorld();
+			this.setControls(EnumSet.of(Goal.Control.MOVE));
+		}
+		@Override
+		public boolean canStart() {
+			if (!this.world.isDay()) return false;
+			if (this.mob.isTouchingWater()) return false;
+			Vec3d vec3d = this.getWanderTarget();
+			if (vec3d == null) return false;
+			this.x = vec3d.x;
+			this.y = vec3d.y;
+			this.z = vec3d.z;
 			return true;
 		}
-		else return super.setApplicableComponent(type, value);
-	}
-	@Override
-	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
-		DrownedVillagerEntity zombieVillagerEntity = villager.convertTo(ZombieVillagerVariants.DROWNED_VILLAGER, EntityConversionContext.create(villager, true, true), zombieVillager -> {
-			zombieVillager.initialize(world, world.getLocalDifficulty(zombieVillager.getBlockPos()), SpawnReason.CONVERSION, new ZombieData(false, true));
-			zombieVillager.setVillagerData(villager.getVillagerData());
-			zombieVillager.setGossip(villager.getGossip().copy());
-			zombieVillager.setOfferData(villager.getOffers().copy());
-			zombieVillager.setExperience(villager.getExperience());
-			if (!this.isSilent()) {
-				world.syncWorldEvent(null, WorldEvents.ZOMBIE_INFECTS_VILLAGER, this.getBlockPos(), 0);
+		@Override
+		public boolean shouldContinue() { return !this.mob.getNavigation().isIdle(); }
+		@Override
+		public void start() { this.mob.getNavigation().startMovingTo(this.x, this.y, this.z, this.speed); }
+		private Vec3d getWanderTarget() {
+			Random random = this.mob.getRandom();
+			BlockPos blockPos = this.mob.getBlockPos();
+			for (int i = 0; i < 10; ++i) {
+				BlockPos blockPos2 = blockPos.add(random.nextInt(20) - 10, 2 - random.nextInt(8), random.nextInt(20) - 10);
+				if (!this.world.getBlockState(blockPos2).isOf(Blocks.WATER)) continue;
+				return Vec3d.ofBottomCenter(blockPos2);
 			}
-		});
-		return zombieVillagerEntity != null;
+			return null;
+		}
+	}
+	public static class TridentAttackGoal extends ProjectileAttackGoal {
+		private final MobEntity mob;
+		public TridentAttackGoal(RangedAttackMob rangedAttackMob, double d, int i, float f) {
+			super(rangedAttackMob, d, i, f);
+			this.mob = (MobEntity)rangedAttackMob;
+		}
+		@Override
+		public boolean canStart() { return super.canStart() && this.mob.getMainHandStack().isOf(Items.TRIDENT); }
+		@Override
+		public void start() {
+			super.start();
+			this.mob.setAttacking(true);
+			this.mob.setCurrentHand(Hand.MAIN_HAND);
+		}
+		@Override
+		public void stop() {
+			super.stop();
+			this.mob.clearActiveItem();
+			this.mob.setAttacking(false);
+		}
+	}
+	protected static class DrownedAttackGoal extends ZombieAttackGoal {
+		private final DrownedVillagerEntity drowned;
+		public DrownedAttackGoal(DrownedVillagerEntity drowned, double speed, boolean pauseWhenMobIdle) {
+			super(drowned, speed, pauseWhenMobIdle);
+			this.drowned = drowned;
+		}
+		@Override
+		public boolean canStart() {
+			return super.canStart() && this.drowned.canDrownedAttackTarget(this.drowned.getTarget());
+		}
+		@Override
+		public boolean shouldContinue() {
+			return super.shouldContinue() && this.drowned.canDrownedAttackTarget(this.drowned.getTarget());
+		}
+	}
+	protected static class LeaveWaterGoal extends MoveToTargetPosGoal {
+		private final DrownedVillagerEntity drowned;
+		public LeaveWaterGoal(DrownedVillagerEntity drowned, double speed) {
+			super(drowned, speed, 8, 2);
+			this.drowned = drowned;
+		}
+		@Override
+		public boolean canStart() {
+			return super.canStart() && !this.drowned.getEntityWorld().isDay() && this.drowned.isTouchingWater() && this.drowned.getY() >= (double)(this.drowned.getEntityWorld().getSeaLevel() - 3);
+		}
+		@Override
+		protected boolean isTargetPos(WorldView world, BlockPos pos) {
+			BlockPos blockPos = pos.up();
+			if (!world.isAir(blockPos) || !world.isAir(blockPos.up())) return false;
+			return world.getBlockState(pos).hasSolidTopSurface(world, pos, this.drowned);
+		}
+		@Override
+		public void start() {
+			this.drowned.setTargetingUnderwater(false);
+			super.start();
+		}
+	}
+	protected static class TargetAboveWaterGoal extends Goal {
+		private final DrownedVillagerEntity drowned;
+		private final double speed;
+		private final int minY;
+		private boolean foundTarget;
+		public TargetAboveWaterGoal(DrownedVillagerEntity drowned, double speed, int minY) {
+			this.drowned = drowned;
+			this.speed = speed;
+			this.minY = minY;
+		}
+		@Override
+		public boolean canStart() {
+			return !this.drowned.getEntityWorld().isDay() && this.drowned.isTouchingWater() && this.drowned.getY() < (double)(this.minY - 2);
+		}
+		@Override
+		public boolean shouldContinue() { return this.canStart() && !this.foundTarget; }
+		@Override
+		public void tick() {
+			if (this.drowned.getY() < (double)(this.minY - 1) && (this.drowned.getNavigation().isIdle() || this.drowned.hasFinishedCurrentPath())) {
+				Vec3d vec3d = NoPenaltyTargeting.findTo(this.drowned, 4, 8, new Vec3d(this.drowned.getX(), this.minY - 1, this.drowned.getZ()), 1.5707963705062866);
+				if (vec3d == null) {
+					this.foundTarget = true;
+					return;
+				}
+				this.drowned.getNavigation().startMovingTo(vec3d.x, vec3d.y, vec3d.z, this.speed);
+			}
+		}
+		@Override
+		public void start() {
+			this.drowned.setTargetingUnderwater(true);
+			this.foundTarget = false;
+		}
+		@Override
+		public void stop() { this.drowned.setTargetingUnderwater(false); }
 	}
 }

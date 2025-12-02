@@ -1,36 +1,20 @@
 package fun.wich.mixin;
 
-import fun.wich.DrownedVillagerEntity;
+import fun.wich.ExtendedZombieVillagerEntity;
 import fun.wich.ZombieVillagerVariants;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.conversion.EntityConversionContext;
 import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(DrownedEntity.class)
 public class DrownedEntityMixin extends ZombieEntity {
-	public DrownedEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) {
-		super(entityType, world);
-	}
+	public DrownedEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
 	@Override
 	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
-		DrownedVillagerEntity zombieVillagerEntity = villager.convertTo(ZombieVillagerVariants.DROWNED_VILLAGER, EntityConversionContext.create(villager, true, true), zombieVillager -> {
-					zombieVillager.initialize(world, world.getLocalDifficulty(zombieVillager.getBlockPos()), SpawnReason.CONVERSION, new ZombieEntity.ZombieData(false, true));
-					zombieVillager.setVillagerData(villager.getVillagerData());
-					zombieVillager.setGossip(villager.getGossip().copy());
-					zombieVillager.setOfferData(villager.getOffers().copy());
-					zombieVillager.setExperience(villager.getExperience());
-					if (!this.isSilent()) {
-						world.syncWorldEvent(null, WorldEvents.ZOMBIE_INFECTS_VILLAGER, this.getBlockPos(), 0);
-					}
-				}
-		);
-		return zombieVillagerEntity != null;
+		return ExtendedZombieVillagerEntity.InfectVillager(world, villager, ZombieVillagerVariants.DROWNED_VILLAGER);
 	}
 }

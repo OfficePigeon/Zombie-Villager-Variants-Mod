@@ -6,8 +6,11 @@
 	"DefaultBiomeFeaturesMixin",
 	"DrownedEntityMixin",
 	"HuskEntityMixin",
+	"LootTablesMixin",
 	"ParrotEntityMixin",
+	"VillagerEntityMixin",
 	"VillagerHostilesSensorMixin",
+	"ZombieEntityMixin",
 	"ZombieVillagerEntityMixin"
   ],
   "injectors": {

@@ -33,17 +33,22 @@
   },
   "entity.drowned_villager.step": {
 	"sounds": [ "mob/drowned/step1", "mob/drowned/step2", "mob/drowned/step3", "mob/drowned/step4", "mob/drowned/step5" ],
-	"subtitle": "subtitles.block.generic.footsteps"
+	"subtitle": "subtitles.entity.drowned_villager.step"
   },
   "entity.drowned_villager.swim": {
 	"sounds": [ "liquid/swim1", "liquid/swim2", "liquid/swim3", "liquid/swim4", "liquid/swim5" ],
 	"subtitle": "subtitles.entity.drowned_villager.swim"
   },
-  
+  "entity.zombie_villager.converted_to_drowned_villager": {
+	"sounds": [ "mob/drowned/convert1", "mob/drowned/convert2", "mob/drowned/convert3" ],
+	"subtitle": "subtitles.entity.zombie_villager.converted_to_drowned_villager"
+  },
   "entity.parrot.imitate.drowned_villager": {
 	"sounds": [ { "name": "wich:entity.drowned_villager.ambient", "pitch": 1.8, "type": "event", "volume": 0.6 } ],
 	"subtitle": "subtitles.entity.parrot.imitate.drowned_villager"
   },
+  
+  
   
   "entity.villager_husk.ambient": {
 	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
@@ -65,9 +70,154 @@
 	"sounds": [ "mob/husk/step1", "mob/husk/step2", "mob/husk/step3", "mob/husk/step4", "mob/husk/step5" ],
 	"subtitle": "subtitles.block.generic.footsteps"
   },
-  
+  "entity.villager_husk.converted_to_zombie_villager": {
+	"sounds": [
+	  { "name": "mob/husk/convert1", "volume": 0.8 },
+	  { "name": "mob/husk/convert2", "volume": 0.8 }
+	],
+	"subtitle": "subtitles.entity.villager_husk.converted_to_zombie_villager"
+  },
   "entity.parrot.imitate.villager_husk": {
 	"sounds": [ { "name": "wich:entity.villager_husk.ambient", "pitch": 1.8, "type": "event", "volume": 0.6 } ],
 	"subtitle": "subtitles.entity.parrot.imitate.villager_husk"
+  },
+  
+  
+  
+  "entity.bouldering_zombie_villager.ambient": {
+	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
+	"subtitle": "subtitles.entity.bouldering_zombie_villager.ambient"
+  },
+  "entity.bouldering_zombie_villager.cure": {
+	"sounds": [ "mob/zombie/remedy" ],
+	"subtitle": "subtitles.entity.bouldering_zombie_villager.cure"
+  },
+  "entity.bouldering_zombie_villager.death": {
+	"sounds": [ "mob/zombie_villager/death" ],
+	"subtitle": "subtitles.entity.bouldering_zombie_villager.death"
+  },
+  "entity.bouldering_zombie_villager.hurt": {
+	"sounds": [ "mob/zombie_villager/hurt1", "mob/zombie_villager/hurt2" ],
+	"subtitle": "subtitles.entity.bouldering_zombie_villager.hurt"
+  },
+  "entity.bouldering_zombie_villager.step": {
+	"sounds": [ "mob/zombie/step1", "mob/zombie/step2", "mob/zombie/step3", "mob/zombie/step4", "mob/zombie/step5" ],
+	"subtitle": "subtitles.block.generic.footsteps"
+  },
+  "entity.bouldering_zombie_villager.climb": {
+	"sounds": [
+	  { "name": "wich:mob/bouldering_zombie_villager/climb1", "volume": 0.75 },
+	  { "name": "wich:mob/bouldering_zombie_villager/climb2", "volume": 0.75 },
+	  { "name": "wich:mob/bouldering_zombie_villager/climb3", "volume": 0.75 }
+	],
+	"subtitle": "subtitles.entity.bouldering_zombie_villager.climb"
+  },
+  "entity.parrot.imitate.bouldering_zombie_villager": {
+	"sounds": [ { "name": "wich:entity.bouldering_zombie_villager.ambient", "pitch": 1.8, "type": "event", "volume": 0.6 } ],
+	"subtitle": "subtitles.entity.parrot.imitate.bouldering_zombie_villager"
+  },
+  
+  
+  
+  "entity.frozen_zombie_villager.ambient": {
+	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
+	"subtitle": "subtitles.entity.frozen_zombie_villager.ambient"
+  },
+  "entity.frozen_zombie_villager.cure": {
+	"sounds": [ "mob/zombie/remedy" ],
+	"subtitle": "subtitles.entity.frozen_zombie_villager.cure"
+  },
+  "entity.frozen_zombie_villager.death": {
+	"sounds": [ "mob/zombie_villager/death" ],
+	"subtitle": "subtitles.entity.frozen_zombie_villager.death"
+  },
+  "entity.frozen_zombie_villager.hurt": {
+	"sounds": [ "mob/zombie_villager/hurt1", "mob/zombie_villager/hurt2" ],
+	"subtitle": "subtitles.entity.frozen_zombie_villager.hurt"
+  },
+  "entity.frozen_zombie_villager.step": {
+	"sounds": [ "mob/zombie/step1", "mob/zombie/step2", "mob/zombie/step3", "mob/zombie/step4", "mob/zombie/step5" ],
+	"subtitle": "subtitles.block.generic.footsteps"
+  },
+  "entity.zombie_villager.converted_to_frozen_zombie_villager": {
+	"sounds": [ "wich:mob/frozen_zombie_villager/convert1", "wich:mob/frozen_zombie_villager/convert2", "wich:mob/frozen_zombie_villager/convert3", "wich:mob/frozen_zombie_villager/convert4" ],
+	"subtitle": "subtitles.entity.zombie_villager.converted_to_frozen_zombie_villager"
+  },
+  "entity.frozen_zombie_villager.converted_to_zombie_villager": {
+	"sounds": [
+	  { "name": "mob/husk/convert1", "volume": 0.8 },
+	  { "name": "mob/husk/convert2", "volume": 0.8 }
+	],
+	"subtitle": "subtitles.entity.frozen_zombie_villager.converted_to_zombie_villager"
+  },
+  "entity.parrot.imitate.frozen_zombie_villager": {
+	"sounds": [ { "name": "wich:entity.frozen_zombie_villager.ambient", "pitch": 1.8, "type": "event", "volume": 0.6 } ],
+	"subtitle": "subtitles.entity.parrot.imitate.frozen_zombie_villager"
+  },
+  
+  
+  
+  "entity.jungle_zombie_villager.ambient": {
+	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
+	"subtitle": "subtitles.entity.jungle_zombie_villager.ambient"
+  },
+  "entity.jungle_zombie_villager.cure": {
+	"sounds": [ "mob/zombie/remedy" ],
+	"subtitle": "subtitles.entity.jungle_zombie_villager.cure"
+  },
+  "entity.jungle_zombie_villager.death": {
+	"sounds": [ "mob/zombie_villager/death" ],
+	"subtitle": "subtitles.entity.jungle_zombie_villager.death"
+  },
+  "entity.jungle_zombie_villager.hurt": {
+	"sounds": [ "mob/zombie_villager/hurt1", "mob/zombie_villager/hurt2" ],
+	"subtitle": "subtitles.entity.jungle_zombie_villager.hurt"
+  },
+  "entity.jungle_zombie_villager.step": {
+	"sounds": [ "mob/zombie/step1", "mob/zombie/step2", "mob/zombie/step3", "mob/zombie/step4", "mob/zombie/step5" ],
+	"subtitle": "subtitles.block.generic.footsteps"
+  },
+  "entity.jungle_zombie_villager.shear": {
+	"sounds": [ "mob/sheep/shear" ],
+	"subtitle": "subtitles.item.shears.shear"
+  },
+  "entity.parrot.imitate.jungle_zombie_villager": {
+	"sounds": [ { "name": "wich:entity.jungle_zombie_villager.ambient", "pitch": 1.8, "type": "event", "volume": 0.6 } ],
+	"subtitle": "subtitles.entity.parrot.imitate.jungle_zombie_villager"
+  },
+  
+  
+  
+  "entity.lobber_zombie_villager.ambient": {
+	"sounds": [ "mob/zombie_villager/say1", "mob/zombie_villager/say2", "mob/zombie_villager/say3" ],
+	"subtitle": "subtitles.entity.lobber_zombie_villager.ambient"
+  },
+  "entity.lobber_zombie_villager.cure": {
+	"sounds": [ "mob/zombie/remedy" ],
+	"subtitle": "subtitles.entity.lobber_zombie_villager.cure"
+  },
+  "entity.lobber_zombie_villager.death": {
+	"sounds": [ "mob/zombie_villager/death" ],
+	"subtitle": "subtitles.entity.lobber_zombie_villager.death"
+  },
+  "entity.lobber_zombie_villager.hurt": {
+	"sounds": [ "mob/zombie_villager/hurt1", "mob/zombie_villager/hurt2" ],
+	"subtitle": "subtitles.entity.lobber_zombie_villager.hurt"
+  },
+  "entity.lobber_zombie_villager.step": {
+	"sounds": [ "mob/zombie/step1", "mob/zombie/step2", "mob/zombie/step3", "mob/zombie/step4", "mob/zombie/step5" ],
+	"subtitle": "subtitles.block.generic.footsteps"
+  },
+  "entity.lobber_zombie_villager.throw": {
+	"sounds": [
+	  { "name": "wich:mob/lobber_zombie_villager/throw1", "volume": 0.25 },
+	  { "name": "wich:mob/lobber_zombie_villager/throw2", "volume": 0.25 },
+	  { "name": "wich:mob/lobber_zombie_villager/throw3", "volume": 0.25 }
+	],
+	"subtitle": "subtitles.entity.lobber_zombie_villager.throw"
+  },
+  "entity.parrot.imitate.lobber_zombie_villager": {
+	"sounds": [ { "name": "wich:entity.lobber_zombie_villager.ambient", "pitch": 1.8, "type": "event", "volume": 0.6 } ],
+	"subtitle": "subtitles.entity.parrot.imitate.lobber_zombie_villager"
   }
 }
