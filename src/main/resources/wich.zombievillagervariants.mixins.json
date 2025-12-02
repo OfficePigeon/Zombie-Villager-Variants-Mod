@@ -4,8 +4,6 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
 	"ZombieVillagerVariants_DefaultBiomeFeaturesMixin",
-	"ZombieVillagerVariants_DrownedEntityMixin",
-	"ZombieVillagerVariants_HuskEntityMixin",
 	"ZombieVillagerVariants_LootTablesMixin",
 	"ZombieVillagerVariants_ParrotEntityMixin",
 	"ZombieVillagerVariants_VillagerEntityMixin",
