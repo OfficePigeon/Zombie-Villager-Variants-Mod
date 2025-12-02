@@ -175,9 +175,7 @@ public class ZombieVillagerVariants implements ModInitializer {
 	);
 	public static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> type) {
 		RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, name));
-		EntityType<T> entityType = type.build(key);
-		Registry.register(Registries.ENTITY_TYPE, key, entityType);
-		return entityType;
+		return Registry.register(Registries.ENTITY_TYPE, key, type.build(key));
 	}
 
 	public static final Item DROWNED_VILLAGER_SPAWN_EGG = register("drowned_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(DROWNED_VILLAGER));
@@ -188,9 +186,7 @@ public class ZombieVillagerVariants implements ModInitializer {
 	public static final Item LOBBER_ZOMBIE_VILLAGER_SPAWN_EGG = register("lobber_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(LOBBER_ZOMBIE_VILLAGER));
 	public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
 		RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, name));
-		Item item = itemFactory.apply(settings.registryKey(key));
-		Registry.register(Registries.ITEM, key, item);
-		return item;
+		return Registry.register(Registries.ITEM, key, itemFactory.apply(settings.registryKey(key)));
 	}
 	public static final RegistryKey<LootTable> JUNGLE_ZOMBIE_VILLAGER_SHEARING = ZombieVillagerVariants_LootTablesMixin.registerLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(MOD_ID, "shearing/jungle_zombie_villager")));
 
