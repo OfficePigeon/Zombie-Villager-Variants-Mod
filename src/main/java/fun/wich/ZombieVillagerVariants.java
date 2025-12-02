@@ -177,9 +177,7 @@ public class ZombieVillagerVariants implements ModInitializer {
 	public static final Item LOBBER_ZOMBIE_VILLAGER_SPAWN_EGG = register("lobber_zombie_villager_spawn_egg", settings -> new SpawnEggItem(LOBBER_ZOMBIE_VILLAGER, 0xffffff, 0xffffff, settings), new Item.Settings());
 	public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
 		RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, name));
-		Item item = itemFactory.apply(settings);
-		Registry.register(Registries.ITEM, key, item);
-		return item;
+		return Registry.register(Registries.ITEM, key, itemFactory.apply(settings));
 	}
 	public static final RegistryKey<LootTable> JUNGLE_ZOMBIE_VILLAGER_SHEARING = ZombieVillagerVariants_LootTablesMixin.registerLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(MOD_ID, "shearing/jungle_zombie_villager")));
 
