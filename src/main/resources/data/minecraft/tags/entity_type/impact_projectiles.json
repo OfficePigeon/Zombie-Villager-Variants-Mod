@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+	{ "id": "wich:frozen_zombie_villager_snowball", "required": false },
+	{ "id": "wich:lobber_zombie_villager_thrown_flesh", "required": false }
+  ]
+}

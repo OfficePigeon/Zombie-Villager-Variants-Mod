@@ -9,6 +9,7 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.AmphibiousSwimNavigation;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
+import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -45,14 +46,13 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 	public DrownedVillagerEntity(EntityType<? extends ZombieVillagerEntity> entityType, World world) {
 		super(entityType, world);
 		this.moveControl = new DrownedMoveControl(this);
+		this.setPathfindingPenalty(PathNodeType.WATER, 0.0f);
 	}
 	public static DefaultAttributeContainer.Builder createDrownedAttributes() {
 		return createZombieAttributes().add(EntityAttributes.STEP_HEIGHT, 1.0);
 	}
 	@Override
-	protected EntityNavigation createNavigation(World world) {
-		return new AmphibiousSwimNavigation(this, world);
-	}
+	protected EntityNavigation createNavigation(World world) { return new AmphibiousSwimNavigation(this, world); }
 	@Override
 	protected void initCustomGoals() {
 		this.goalSelector.add(1, new WanderAroundOnSurfaceGoal(this, 1.0));

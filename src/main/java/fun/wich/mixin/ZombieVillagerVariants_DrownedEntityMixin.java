@@ -11,8 +11,8 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(DrownedEntity.class)
-public class DrownedEntityMixin extends ZombieEntity {
-	public DrownedEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
+public class ZombieVillagerVariants_DrownedEntityMixin extends ZombieEntity {
+	public ZombieVillagerVariants_DrownedEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
 	@Override
 	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
 		return ExtendedZombieVillagerEntity.InfectVillager(world, villager, ZombieVillagerVariants.DROWNED_VILLAGER);

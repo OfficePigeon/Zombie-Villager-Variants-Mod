@@ -15,6 +15,5 @@ public class JungleZombieVillagerEntityRenderer extends ExtendedZombieVillagerEn
 		super(context);
 		this.addFeature(new ZombieVillagerOverlayFeatureRenderer(this, context.getEntityModels(), SKIN));
 	}
-	@Override
-	public Identifier getTexture(ExtendedZombieVillagerRenderState zombieVillagerRenderState) { return TEXTURE; }
+	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
 }

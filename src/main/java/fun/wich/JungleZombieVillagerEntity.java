@@ -21,6 +21,7 @@ import net.minecraft.world.event.GameEvent;
 
 public class JungleZombieVillagerEntity extends ExtendedZombieVillagerEntity implements Shearable {
 	public JungleZombieVillagerEntity(EntityType<? extends ZombieVillagerEntity> entityType, World world) { super(entityType, world); }
+	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (itemStack.isOf(Items.SHEARS) && this.isShearable()) {
@@ -33,6 +34,7 @@ public class JungleZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 		}
 		else return super.interactMob(player, hand);
 	}
+	@Override
 	public void sheared(ServerWorld world, SoundCategory shearedSoundCategory, ItemStack shears) {
 		world.playSoundFromEntity(null, this, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR, shearedSoundCategory, 1, 1);
 		ConvertToZombieVillagerEntity(this, EntityType.ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR);
@@ -42,6 +44,7 @@ public class JungleZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 			}
 		});
 	}
+	@Override
 	public boolean isShearable() { return this.isAlive() && !this.isBaby(); }
 	@Override
 	public SoundEvent GetCureSound() { return ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_CURE; }

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DefaultBiomeFeatures.class)
-public class DefaultBiomeFeaturesMixin {
+public class ZombieVillagerVariants_DefaultBiomeFeaturesMixin {
 	@Inject(method="addMonsters", at=@At("HEAD"))
 	private static void AddZombieOrDrownedVillagers(SpawnSettings.Builder builder, int zombieWeight, int zombieVillagerWeight, int skeletonWeight, boolean drowned, CallbackInfo ci) {
 		builder.spawn(SpawnGroup.MONSTER, zombieVillagerWeight, new SpawnSettings.SpawnEntry(drowned ? ZombieVillagerVariants.DROWNED_VILLAGER : EntityType.ZOMBIE_VILLAGER, 1, 1));

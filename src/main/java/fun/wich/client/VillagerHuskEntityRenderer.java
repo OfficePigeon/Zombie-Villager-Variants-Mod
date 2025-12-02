@@ -11,5 +11,5 @@ import net.minecraft.util.Identifier;
 public class VillagerHuskEntityRenderer extends ExtendedZombieVillagerEntityRenderer<VillagerHuskEntity> {
 	public static final Identifier TEXTURE = Identifier.of(ZombieVillagerVariants.MOD_ID,"textures/entity/villager_husk/villager_husk.png");
 	public VillagerHuskEntityRenderer(EntityRendererFactory.Context context) { super(context); }
-	public Identifier getTexture(ExtendedZombieVillagerRenderState zombieVillagerRenderState) { return TEXTURE; }
+	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
 }

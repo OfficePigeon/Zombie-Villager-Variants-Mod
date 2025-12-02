@@ -16,10 +16,9 @@ public class DrownedVillagerEntityRenderer extends ExtendedZombieVillagerEntityR
 	public static final Identifier SKIN = Identifier.of(ZombieVillagerVariants.MOD_ID,"textures/entity/drowned_villager/drowned_villager_outer_layer.png");
 	public DrownedVillagerEntityRenderer(EntityRendererFactory.Context context) {
 		super(context);
-		this.addFeature(new ZombieVillagerOverlayFeatureRenderer(this, context.getEntityModels(), SKIN));
+		this.addFeature(new ZombieVillagerOverlayFeatureRenderer(this, context.getEntityModels(), TEXTURE, ZombieVillagerVariantsClient.MULTILAYER_ZOMBIE_VILLAGER_INNER, ZombieVillagerVariantsClient.MULTILAYER_ZOMBIE_VILLAGER_BABY_INNER));
 	}
-	@Override
-	public Identifier getTexture(ExtendedZombieVillagerRenderState zombieVillagerRenderState) { return TEXTURE; }
+	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return SKIN; }
 	@Override
 	protected BipedEntityModel.ArmPose getArmPose(DrownedVillagerEntity entity, Arm arm) {
 		if (entity.getMainArm() == arm && entity.isAttacking() && entity.getStackInArm(arm).isOf(Items.TRIDENT)) return BipedEntityModel.ArmPose.THROW_SPEAR;

@@ -27,10 +27,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ZombieVillagerEntity.class)
-public abstract class ZombieVillagerEntityMixin extends ZombieEntity implements Mixin_VillagerExposing, ZombieVillagerFreezeTracker {
+public abstract class ZombieVillagerVariants_ZombieVillagerEntityMixin extends ZombieEntity implements Mixin_VillagerExposing, ZombieVillagerFreezeTracker {
 	@Unique @SuppressWarnings("WrongEntityDataParameterClass")
-	private static final TrackedData<Boolean> ZOMBIE_VILLAGER_CONVERTING_IN_SNOW = DataTracker.registerData(ZombieVillagerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);;
-	public ZombieVillagerEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
+	private static final TrackedData<Boolean> ZOMBIE_VILLAGER_CONVERTING_IN_SNOW = DataTracker.registerData(ZombieVillagerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	public ZombieVillagerVariants_ZombieVillagerEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
 	//Expose Villager Fields
 	@Shadow private VillagerGossips gossip;
 	@Shadow private TradeOfferList offerData;

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(VillagerHostilesSensor.class)
-public class VillagerHostilesSensorMixin {
+public class ZombieVillagerVariants_VillagerHostilesSensorMixin {
 	@Inject(method="matches", at = @At("HEAD"), cancellable = true)
 	protected void Matches(ServerWorld world, LivingEntity entity, LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
 		double distance = entity.squaredDistanceTo(target);

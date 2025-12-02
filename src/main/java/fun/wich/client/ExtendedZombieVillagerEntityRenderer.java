@@ -42,14 +42,12 @@ public abstract class ExtendedZombieVillagerEntityRenderer<E extends ExtendedZom
 		);
 	}
 	public ExtendedZombieVillagerRenderState createRenderState() { return new ExtendedZombieVillagerRenderState(); }
-	protected boolean isShaking(ExtendedZombieVillagerRenderState zombieVillagerRenderState) {
-		return super.isShaking(zombieVillagerRenderState) || zombieVillagerRenderState.convertingInWater;
-	}
-	public void updateRenderState(E entity, ExtendedZombieVillagerRenderState zombieVillagerRenderState, float f) {
-		super.updateRenderState(entity, zombieVillagerRenderState, f);
-		zombieVillagerRenderState.convertingInWater = entity.isConverting() || entity.isConvertingInWater();
-		zombieVillagerRenderState.villagerData = entity.getVillagerData();
-		zombieVillagerRenderState.attacking = entity.isAttacking();
-		if (entity instanceof LobberZombieVillagerEntity lobber) zombieVillagerRenderState.attackingRanged = lobber.IsAttackingRanged();
+	@Override protected boolean isShaking(ExtendedZombieVillagerRenderState state) { return super.isShaking(state) || state.convertingInWater; }
+	public void updateRenderState(E entity, ExtendedZombieVillagerRenderState state, float f) {
+		super.updateRenderState(entity, state, f);
+		state.convertingInWater = entity.isConverting() || entity.isConvertingInWater();
+		state.villagerData = entity.getVillagerData();
+		state.attacking = entity.isAttacking();
+		if (entity instanceof LobberZombieVillagerEntity lobber) state.attackingRanged = lobber.IsAttackingRanged();
 	}
 }

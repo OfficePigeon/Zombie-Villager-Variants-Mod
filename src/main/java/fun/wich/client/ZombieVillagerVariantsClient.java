@@ -12,13 +12,17 @@ import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
 public class ZombieVillagerVariantsClient implements ClientModInitializer {
-	public static final EntityModelLayer MULTILAYER_ZOMBIE_VILLAGER_OUTER = MakeModelLayer("multilayer_zombie_villager");
-	public static final EntityModelLayer MULTILAYER_ZOMBIE_VILLAGER_BABY_OUTER = MakeModelLayer("multilayer_zombie_villager_baby");
-	private static EntityModelLayer MakeModelLayer(String id) {
-		return new EntityModelLayer(Identifier.of(ZombieVillagerVariants.MOD_ID, id), "outer");
+	public static final EntityModelLayer MULTILAYER_ZOMBIE_VILLAGER_INNER = MakeModelLayer("multilayer_zombie_villager", "inner");
+	public static final EntityModelLayer MULTILAYER_ZOMBIE_VILLAGER_BABY_INNER = MakeModelLayer("multilayer_zombie_villager_baby", "inner");
+	public static final EntityModelLayer MULTILAYER_ZOMBIE_VILLAGER_OUTER = MakeModelLayer("multilayer_zombie_villager", "outer");
+	public static final EntityModelLayer MULTILAYER_ZOMBIE_VILLAGER_BABY_OUTER = MakeModelLayer("multilayer_zombie_villager_baby", "outer");
+	private static EntityModelLayer MakeModelLayer(String id, String name) {
+		return new EntityModelLayer(Identifier.of(ZombieVillagerVariants.MOD_ID, id), name);
 	}
 	@Override
 	public void onInitializeClient() {
+		EntityModelLayerRegistry.registerModelLayer(MULTILAYER_ZOMBIE_VILLAGER_INNER, () -> DilatedZombieVillagerEntityModel.getDilatedTexturedModelData(-0.25F));
+		EntityModelLayerRegistry.registerModelLayer(MULTILAYER_ZOMBIE_VILLAGER_BABY_INNER, () -> DilatedZombieVillagerEntityModel.getDilatedTexturedModelData(-0.25F).transform(BipedEntityModel.BABY_TRANSFORMER));
 		EntityModelLayerRegistry.registerModelLayer(MULTILAYER_ZOMBIE_VILLAGER_OUTER, () -> DilatedZombieVillagerEntityModel.getDilatedTexturedModelData(0.25F));
 		EntityModelLayerRegistry.registerModelLayer(MULTILAYER_ZOMBIE_VILLAGER_BABY_OUTER, () -> DilatedZombieVillagerEntityModel.getDilatedTexturedModelData(0.25F).transform(BipedEntityModel.BABY_TRANSFORMER));
 		EntityRendererFactories.register(ZombieVillagerVariants.DROWNED_VILLAGER, DrownedVillagerEntityRenderer::new);

@@ -7,6 +7,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(LootTables.class)
-public interface LootTablesMixin {
+public interface ZombieVillagerVariants_LootTablesMixin {
 	@Invoker("registerLootTable") static RegistryKey<LootTable> registerLootTable(RegistryKey<LootTable> key) { return null; }
 }

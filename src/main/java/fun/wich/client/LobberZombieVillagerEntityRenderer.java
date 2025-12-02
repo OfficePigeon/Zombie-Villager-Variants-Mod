@@ -17,10 +17,11 @@ public class LobberZombieVillagerEntityRenderer extends ExtendedZombieVillagerEn
 		super(context);
 		this.features.removeIf(feature -> feature instanceof HeldItemFeatureRenderer);
 		this.addFeature(new HeldItemFeatureRenderer<>(this) {
-			public void render(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int i, ExtendedZombieVillagerRenderState state, float f, float g) {
-				if (state.attackingRanged) super.render(matrixStack, orderedRenderCommandQueue, i, state, f, g);
+			@Override
+			public void render(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int light, ExtendedZombieVillagerRenderState state, float headYaw, float headPitch) {
+				if (state.attackingRanged) super.render(matrixStack, orderedRenderCommandQueue, light, state, headYaw, headPitch);
 			}
 		});
 	}
-	public Identifier getTexture(ExtendedZombieVillagerRenderState zombieVillagerRenderState) { return TEXTURE; }
+	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
 }

@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(VillagerEntity.class)
-public abstract class VillagerEntityMixin extends MerchantEntity implements InteractionObserver, VillagerDataContainer, Mixin_VillagerExposing {
+public abstract class ZombieVillagerVariants_VillagerEntityMixin extends MerchantEntity implements InteractionObserver, VillagerDataContainer, Mixin_VillagerExposing {
 	@Shadow public abstract VillagerGossips getGossip();
 	@Shadow public abstract int getExperience();
 	@Shadow public abstract VillagerData getVillagerData();
-	public VillagerEntityMixin(EntityType<? extends MerchantEntity> entityType, World world) { super(entityType, world); }
+	public ZombieVillagerVariants_VillagerEntityMixin(EntityType<? extends MerchantEntity> entityType, World world) { super(entityType, world); }
 	@Override
 	public VillagerData Mixin_VillagerExposing_GetVillagerData() { return this.getVillagerData(); }
 	@Override

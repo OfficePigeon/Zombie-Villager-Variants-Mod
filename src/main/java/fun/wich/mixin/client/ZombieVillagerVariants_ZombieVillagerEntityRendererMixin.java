@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ZombieVillagerEntityRenderer.class)
-public class ZombieVillagerEntityRendererMixin {
+public class ZombieVillagerVariants_ZombieVillagerEntityRendererMixin {
 	@Inject(method="updateRenderState(Lnet/minecraft/entity/mob/ZombieVillagerEntity;Lnet/minecraft/client/render/entity/state/ZombieVillagerRenderState;F)V", at=@At("TAIL"))
 	private void AllowShakingWhileConverting(ZombieVillagerEntity entity, ZombieVillagerRenderState state, float f, CallbackInfo ci) {
 		state.convertingInWater = entity.isConverting() || entity.isConvertingInWater();
