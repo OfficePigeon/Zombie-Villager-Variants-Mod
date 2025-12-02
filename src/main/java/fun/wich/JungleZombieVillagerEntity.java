@@ -37,9 +37,10 @@ public class JungleZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 	}
 	@Override
 	public void sheared(SoundCategory shearedSoundCategory) {
-		this.getEntityWorld().playSoundFromEntity(null, this, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR, shearedSoundCategory, 1, 1);
+		World world = this.getEntityWorld();
+		world.playSoundFromEntity(null, this, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR, shearedSoundCategory, 1, 1);
 		ConvertToZombieVillagerEntity(this, EntityType.ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR);
-		if (this.getWorld() instanceof ServerWorld serverWorld) {
+		if (world instanceof ServerWorld serverWorld) {
 			LootTable lootTable = serverWorld.getServer().getReloadableRegistries().getLootTable(ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER_SHEARING);
 			LootContextParameterSet lootContextParameterSet = new LootContextParameterSet.Builder(serverWorld)
 					.add(LootContextParameters.ORIGIN, this.getPos())

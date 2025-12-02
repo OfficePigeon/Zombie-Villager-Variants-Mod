@@ -26,10 +26,10 @@ public abstract class ZombieVillagerVariants_ZombieEntityMixin extends HostileEn
 			String from = this.getType().getTranslationKey();
 			if (from == null) return;
 			EntityType<? extends ZombieVillagerEntity> to = null;
-			if (from.endsWith(".drowned") ) to = ZombieVillagerVariants.DROWNED_VILLAGER;
+			if (from.endsWith(".drowned")) to = ZombieVillagerVariants.DROWNED_VILLAGER;
 			else if (from.endsWith(".husk")) to = ZombieVillagerVariants.VILLAGER_HUSK;
-			else if (from.endsWith(".frozen_zombie") ) to = ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER;
-			else if (from.endsWith(".jungle_zombie")) to = ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER;
+			else if (from.endsWith(".frozen_zombie") || from.endsWith("variantsadventures.gelid")) to = ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER;
+			else if (from.endsWith(".jungle_zombie") || from.endsWith("variantsadventures.thicket")) to = ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER;
 			else if (from.endsWith(".lobber_zombie")) to = ZombieVillagerVariants.LOBBER_ZOMBIE_VILLAGER;
 			else if (from.endsWith(".bouldering_zombie")) to = ZombieVillagerVariants.BOULDERING_ZOMBIE_VILLAGER;
 			if (to != null) cir.setReturnValue(ExtendedZombieVillagerEntity.InfectVillager(world, villager, to));
