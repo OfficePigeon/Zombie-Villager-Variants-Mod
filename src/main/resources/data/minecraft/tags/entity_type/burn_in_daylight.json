@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+	{ "id": "wich:drowned_villager", "required": false },
+	{ "id": "wich:bouldering_zombie_villager", "required": false },
+	{ "id": "wich:frozen_zombie_villager", "required": false },
+	{ "id": "wich:jungle_zombie_villager", "required": false },
+	{ "id": "wich:lobber_zombie_villager", "required": false }
+  ]
+}
