@@ -1,0 +1,6 @@
+{
+  "replace": false,
+  "values": [
+	{ "id": "wich:frozen_zombie_villager", "required": false }
+  ]
+}
