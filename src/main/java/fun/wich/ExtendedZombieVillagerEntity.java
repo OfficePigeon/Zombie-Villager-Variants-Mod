@@ -8,7 +8,6 @@ import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.MoveThroughVillageGoal;
 import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
-import net.minecraft.entity.conversion.EntityConversionContext;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.MobEntity;
@@ -19,6 +18,7 @@ import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -29,6 +29,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.village.TradeOfferList;
 import net.minecraft.village.VillagerData;
 import net.minecraft.village.VillagerGossips;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 
 public abstract class ExtendedZombieVillagerEntity extends ZombieVillagerEntity {
@@ -49,15 +50,15 @@ public abstract class ExtendedZombieVillagerEntity extends ZombieVillagerEntity 
 	public void handleStatus(byte status) {
 		if (status == 16) {
 			if (!this.isSilent()) {
-				this.getEntityWorld().playSoundClient(this.getX(), this.getEyeY(), this.getZ(), GetCureSound(), this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F, false);
+				this.getEntityWorld().playSound(this.getX(), this.getEyeY(), this.getZ(), GetCureSound(), this.getSoundCategory(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F, false);
 			}
 		}
 		else super.handleStatus(status);
 	}
 	public RegistryEntry<StatusEffect> GetStatusEffectOnHit() { return null; }
 	@Override
-	public boolean tryAttack(ServerWorld world, Entity target) {
-		boolean bl = super.tryAttack(world, target);
+	public boolean tryAttack(Entity target) {
+		boolean bl = super.tryAttack(target);
 		if (bl) {
 			RegistryEntry<StatusEffect> statusEffect = GetStatusEffectOnHit();
 			if (statusEffect != null) {
@@ -76,19 +77,19 @@ public abstract class ExtendedZombieVillagerEntity extends ZombieVillagerEntity 
 			VillagerData data = villagerEntity.getVillagerData();
 			if (data != null) zombieVillager.setVillagerData(data);
 			VillagerGossips gossip = villagerEntity.getGossip();
-			if (gossip != null) zombieVillager.setGossip(gossip.copy());
+			if (gossip != null) zombieVillager.setGossipData(gossip.serialize(NbtOps.INSTANCE));
 			TradeOfferList offers = villagerEntity.getOffers();
 			if (offers != null) zombieVillager.setOfferData(offers.copy());
-			zombieVillager.setExperience(villagerEntity.getExperience());
+			zombieVillager.setXp(villagerEntity.getExperience());
 		}
 		else if (villager instanceof Mixin_VillagerExposing mixinVillager) {
 			VillagerData data = mixinVillager.Mixin_VillagerExposing_GetVillagerData();
 			if (data != null) zombieVillager.setVillagerData(data);
 			VillagerGossips gossip = mixinVillager.Mixin_VillagerExposing_GetGossip();
-			if (gossip != null) zombieVillager.setGossip(gossip.copy());
+			if (gossip != null) zombieVillager.setGossipData(gossip.serialize(NbtOps.INSTANCE));
 			TradeOfferList offers = mixinVillager.Mixin_VillagerExposing_GetOfferData();
 			if (offers != null) zombieVillager.setOfferData(offers.copy());
-			zombieVillager.setExperience(mixinVillager.Mixin_VillagerExposing_GetExperience());
+			zombieVillager.setXp(mixinVillager.Mixin_VillagerExposing_GetExperience());
 		}
 		else if (villager instanceof ZombieVillagerEntity zombieVillagerEntity) {
 			VillagerData data = zombieVillagerEntity.getVillagerData();
@@ -96,21 +97,25 @@ public abstract class ExtendedZombieVillagerEntity extends ZombieVillagerEntity 
 		}
 		Random random = villager.getRandom();
 		if (!zombieVillager.isSilent() && conversionSound != null) {
-			world.playSoundAtBlockCenterClient(pos, conversionSound, SoundCategory.HOSTILE, 2.0f, (random.nextFloat() - random.nextFloat()) * 0.2f + 1, false);
+			world.playSoundAtBlockCenter(pos, conversionSound, SoundCategory.HOSTILE, 2.0f, (random.nextFloat() - random.nextFloat()) * 0.2f + 1, false);
 		}
 	}
 	public static void ConvertToZombieVillagerEntity(ZombieVillagerEntity source, EntityType<? extends ZombieVillagerEntity> type, SoundEvent conversionSound) {
-		source.convertTo(type, EntityConversionContext.create(source, true, true),
-				zombieVillager -> ProcessZombieVillagerConversion(source.getEntityWorld(), source, zombieVillager, conversionSound));
+		ZombieVillagerEntity zombieVillager = source.convertTo(type, true);
+		if (zombieVillager != null) ProcessZombieVillagerConversion(source.getEntityWorld(), source, zombieVillager, conversionSound);
 	}
 	@Override
-	public boolean infectVillager(ServerWorld world, VillagerEntity villager) {
-		//noinspection unchecked
-		return InfectVillager(world, villager, (EntityType<? extends ZombieVillagerEntity>)getType());
+	public boolean onKilledOther(ServerWorld world, LivingEntity other) {
+		if ((world.getDifficulty() == Difficulty.NORMAL || world.getDifficulty() == Difficulty.HARD) && other instanceof VillagerEntity villager) {
+			if (world.getDifficulty() != Difficulty.HARD && this.random.nextBoolean()) return false;
+			//noinspection unchecked
+			return InfectVillager(world, villager, (EntityType<? extends ZombieVillagerEntity>)getType());
+		}
+		return true;
 	}
 	public static boolean InfectVillager(ServerWorld world, VillagerEntity villager, EntityType<? extends ZombieVillagerEntity> type) {
-		ZombieVillagerEntity zombieVillagerEntity = villager.convertTo(type, EntityConversionContext.create(villager, true, true),
-				zombieVillager -> ProcessZombieVillagerConversion(world, villager, zombieVillager, SoundEvents.ENTITY_ZOMBIE_INFECT));
-		return zombieVillagerEntity != null;
+		ZombieVillagerEntity zombieVillager = villager.convertTo(type, true);
+		if (zombieVillager != null) ProcessZombieVillagerConversion(world, villager, zombieVillager, SoundEvents.ENTITY_ZOMBIE_INFECT);
+		return zombieVillager != null;
 	}
 }

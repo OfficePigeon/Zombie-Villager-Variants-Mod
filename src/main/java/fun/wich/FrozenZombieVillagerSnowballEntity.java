@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 
 public class FrozenZombieVillagerSnowballEntity extends ThrownItemEntity {
 	public FrozenZombieVillagerSnowballEntity(EntityType<? extends FrozenZombieVillagerSnowballEntity> entityType, World world) { super(entityType, world); }
-	public FrozenZombieVillagerSnowballEntity(World world, LivingEntity owner, ItemStack stack) { super(ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER_SNOWBALL, owner, world, stack); }
+	public FrozenZombieVillagerSnowballEntity(World world, LivingEntity owner) { super(ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER_SNOWBALL, owner, world); }
 	@Override
 	protected Item getDefaultItem() { return Items.SNOWBALL; }
 	private ParticleEffect getParticleParameters() {
@@ -30,7 +30,7 @@ public class FrozenZombieVillagerSnowballEntity extends ThrownItemEntity {
 		if (status == 3) {
 			ParticleEffect particleEffect = this.getParticleParameters();
 			for (int i = 0; i < 8; ++i) {
-				this.getEntityWorld().addParticleClient(particleEffect, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+				this.getEntityWorld().addParticle(particleEffect, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
 			}
 		}
 	}
@@ -40,8 +40,7 @@ public class FrozenZombieVillagerSnowballEntity extends ThrownItemEntity {
 		int i = entity instanceof BlazeEntity ? 3 : 0;
 		Entity owner = this.getOwner();
 		if (entity instanceof LivingEntity living) living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 60), owner == null ? this : owner);
-		//noinspection deprecation
-		entity.serverDamage(this.getDamageSources().thrown(this, this.getOwner()), (float)i);
+		entity.damage(this.getDamageSources().thrown(this, this.getOwner()), (float)i);
 	}
 	protected void onCollision(HitResult hitResult) {
 		super.onCollision(hitResult);

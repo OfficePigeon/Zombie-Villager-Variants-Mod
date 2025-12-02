@@ -4,7 +4,7 @@ import fun.wich.LobberZombieVillagerEntity;
 import fun.wich.ZombieVillagerVariants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.feature.HeldItemFeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,12 +16,12 @@ public class LobberZombieVillagerEntityRenderer extends ExtendedZombieVillagerEn
 	public LobberZombieVillagerEntityRenderer(EntityRendererFactory.Context context) {
 		super(context);
 		this.features.removeIf(feature -> feature instanceof HeldItemFeatureRenderer);
-		this.addFeature(new HeldItemFeatureRenderer<>(this) {
+		this.addFeature(new HeldItemFeatureRenderer<>(this, context.getHeldItemRenderer()) {
 			@Override
-			public void render(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, int light, ExtendedZombieVillagerRenderState state, float headYaw, float headPitch) {
-				if (state.attackingRanged) super.render(matrixStack, orderedRenderCommandQueue, light, state, headYaw, headPitch);
+			public void render(MatrixStack matrixStack, VertexConsumerProvider orderedRenderCommandQueue, int light, LobberZombieVillagerEntity state, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+				if (state.IsAttackingRanged()) super.render(matrixStack, orderedRenderCommandQueue, light, state, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch);
 			}
 		});
 	}
-	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
+	@Override public Identifier getTexture(LobberZombieVillagerEntity zombieVillagerRenderState) { return TEXTURE; }
 }

@@ -6,30 +6,28 @@ import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.ai.pathing.AmphibiousSwimNavigation;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
+import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.entity.ai.pathing.SwimNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.*;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.mob.ZombieVillagerEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BiomeTags;
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -43,16 +41,18 @@ import java.util.EnumSet;
 
 public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implements RangedAttackMob {
 	protected boolean targetingUnderwater;
+	protected final SwimNavigation waterNavigation;
+	protected final MobNavigation landNavigation;
 	public DrownedVillagerEntity(EntityType<? extends ZombieVillagerEntity> entityType, World world) {
 		super(entityType, world);
 		this.moveControl = new DrownedMoveControl(this);
-		this.setPathfindingPenalty(PathNodeType.WATER, 0.0f);
+		this.setPathfindingPenalty(PathNodeType.WATER, 0.0F);
+		this.waterNavigation = new SwimNavigation(this, world);
+		this.landNavigation = new MobNavigation(this, world);
 	}
 	public static DefaultAttributeContainer.Builder createDrownedAttributes() {
-		return createZombieAttributes().add(EntityAttributes.STEP_HEIGHT, 1.0);
+		return createZombieAttributes().add(EntityAttributes.GENERIC_STEP_HEIGHT, 1.0);
 	}
-	@Override
-	protected EntityNavigation createNavigation(World world) { return new AmphibiousSwimNavigation(this, world); }
 	@Override
 	protected void initCustomGoals() {
 		this.goalSelector.add(1, new WanderAroundOnSurfaceGoal(this, 1.0));
@@ -62,7 +62,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 		this.goalSelector.add(6, new TargetAboveWaterGoal(this, 1.0, this.getEntityWorld().getSeaLevel()));
 		this.goalSelector.add(7, new WanderAroundGoal(this, 1.0));
 		this.targetSelector.add(1, new RevengeGoal(this, DrownedVillagerEntity.class).setGroupRevenge(ZombifiedPiglinEntity.class));
-		this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, false, (target, world) -> this.canDrownedAttackTarget(target)));
+		this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::canDrownedAttackTarget));
 		this.targetSelector.add(3, new ActiveTargetGoal<>(this, MerchantEntity.class, false));
 		this.targetSelector.add(3, new ActiveTargetGoal<>(this, IronGolemEntity.class, true));
 		this.targetSelector.add(3, new ActiveTargetGoal<>(this, AxolotlEntity.class, true, false));
@@ -73,7 +73,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 		entityData = super.initialize(world, difficulty, spawnReason, entityData);
 		if (this.getEquippedStack(EquipmentSlot.OFFHAND).isEmpty() && world.getRandom().nextFloat() < 0.03f) {
 			this.equipStack(EquipmentSlot.OFFHAND, new ItemStack(Items.NAUTILUS_SHELL));
-			this.setDropGuaranteed(EquipmentSlot.OFFHAND);
+			this.updateDropChances(EquipmentSlot.OFFHAND);
 		}
 		return entityData;
 	}
@@ -90,6 +90,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 		}
 	}
 	public static boolean isValidSpawnDepth(WorldAccess world, BlockPos pos) {
+		//noinspection deprecation
 		return pos.getY() < world.getSeaLevel() - 5;
 	}
 	@Override
@@ -111,8 +112,6 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 	@Override
 	public SoundEvent getSwimSound() { return ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_SWIM; }
 	@Override
-	protected boolean canSpawnAsReinforcementInFluid() { return true; }
-	@Override
 	protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
 		if (random.nextFloat() > 0.9) {
 			if (random.nextInt(16) < 10) this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.TRIDENT));
@@ -120,9 +119,10 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 		}
 	}
 	@Override
-	protected boolean prefersNewEquipment(ItemStack newStack, ItemStack currentStack, EquipmentSlot slot) {
-		if (currentStack.isOf(Items.NAUTILUS_SHELL)) return false;
-		return super.prefersNewEquipment(newStack, currentStack, slot);
+	protected boolean prefersNewEquipment(ItemStack newStack, ItemStack oldStack) {
+		if (oldStack.isOf(Items.NAUTILUS_SHELL)) return false;
+		else if (oldStack.isOf(Items.TRIDENT)) return newStack.isOf(Items.TRIDENT) && newStack.getDamage() < oldStack.getDamage();
+		else return newStack.isOf(Items.TRIDENT) || super.prefersNewEquipment(newStack, oldStack);
 	}
 	@Override
 	public boolean canSpawn(WorldView world) { return world.doesNotIntersectEntities(this); }
@@ -148,7 +148,16 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 	}
 	@Override
 	public void updateSwimming() {
-		if (!this.getEntityWorld().isClient()) this.setSwimming(this.canActVoluntarily() && this.isSubmergedInWater() && this.isTargetingUnderwater());
+		if (!this.getWorld().isClient) {
+			if (this.canMoveVoluntarily() && this.isTouchingWater() && this.isTargetingUnderwater()) {
+				this.navigation = this.waterNavigation;
+				this.setSwimming(true);
+			}
+			else {
+				this.navigation = this.landNavigation;
+				this.setSwimming(false);
+			}
+		}
 	}
 	@Override
 	public boolean isInSwimmingPose() { return this.isSwimming(); }
@@ -166,14 +175,10 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 		double e = target.getBodyY(0.3333333333333333) - tridentEntity.getY();
 		double f = target.getZ() - this.getZ();
 		double g = Math.sqrt(d * d + f * f);
-		World world = this.getEntityWorld();
-		if (world instanceof ServerWorld serverWorld) {
-			ProjectileEntity.spawnWithVelocity(tridentEntity, serverWorld, itemStack2, d, e + g * 0.2, f, 1.6F, (float)(14 - world.getDifficulty().getId() * 4));
-		}
 		this.playSound(ZombieVillagerVariants.ENTITY_DROWNED_VILLAGER_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+		tridentEntity.setVelocity(d, e + g * 0.2F, f, 1.6F, 14 - this.getWorld().getDifficulty().getId() * 4);
+		this.getWorld().spawnEntity(tridentEntity);
 	}
-	@Override
-	public TagKey<Item> getPreferredWeapons() { return ItemTags.DROWNED_PREFERRED_WEAPONS; }
 	public void setTargetingUnderwater(boolean targetingUnderwater) { this.targetingUnderwater = targetingUnderwater; }
 
 	protected static class DrownedMoveControl extends MoveControl {
@@ -189,7 +194,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 				if (livingEntity != null && livingEntity.getY() > this.drowned.getY() || this.drowned.targetingUnderwater) {
 					this.drowned.setVelocity(this.drowned.getVelocity().add(0.0, 0.002, 0.0));
 				}
-				if (this.state != MoveControl.State.MOVE_TO || this.drowned.getNavigation().isIdle()) {
+				if (this.state != State.MOVE_TO || this.drowned.getNavigation().isIdle()) {
 					this.drowned.setMovementSpeed(0.0f);
 					return;
 				}
@@ -199,7 +204,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 				e /= Math.sqrt(d * d + e * e + f * f);
 				this.drowned.setYaw(this.wrapDegrees(this.drowned.getYaw(), (float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0f, 90.0f));
 				this.drowned.bodyYaw = this.drowned.getYaw();
-				float i = (float)(this.speed * this.drowned.getAttributeValue(EntityAttributes.MOVEMENT_SPEED));
+				float i = (float)(this.speed * this.drowned.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
 				float j = MathHelper.lerp(0.125f, this.drowned.getMovementSpeed(), i);
 				this.drowned.setMovementSpeed(j);
 				this.drowned.setVelocity(this.drowned.getVelocity().add(j * d * 0.005, j * e * 0.1, j * f * 0.005));
@@ -221,7 +226,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 			this.mob = mob;
 			this.speed = speed;
 			this.world = mob.getEntityWorld();
-			this.setControls(EnumSet.of(Goal.Control.MOVE));
+			this.setControls(EnumSet.of(Control.MOVE));
 		}
 		@Override
 		public boolean canStart() {
@@ -304,6 +309,7 @@ public class DrownedVillagerEntity extends ExtendedZombieVillagerEntity implemen
 		@Override
 		public void start() {
 			this.drowned.setTargetingUnderwater(false);
+			this.drowned.navigation = this.drowned.landNavigation;
 			super.start();
 		}
 	}

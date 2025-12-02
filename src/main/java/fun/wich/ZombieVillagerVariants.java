@@ -2,7 +2,6 @@ package fun.wich;
 
 import fun.wich.mixin.ZombieVillagerVariants_LootTablesMixin;
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -105,7 +104,6 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.vehicleAttachment(-0.7F)
 					.eyeHeight(1.74F)
 					.maxTrackingRange(8)
-					.notAllowedInPeaceful()
 	);
 	public static final EntityType<VillagerHuskEntity> VILLAGER_HUSK = register(
 			"villager_husk",
@@ -115,7 +113,6 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.vehicleAttachment(-0.7F)
 					.eyeHeight(1.74F)
 					.maxTrackingRange(8)
-					.notAllowedInPeaceful()
 	);
 	public static final EntityType<BoulderingZombieVillagerEntity> BOULDERING_ZOMBIE_VILLAGER = register(
 			"bouldering_zombie_villager",
@@ -125,7 +122,6 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.vehicleAttachment(-0.7F)
 					.eyeHeight(1.74F)
 					.maxTrackingRange(8)
-					.notAllowedInPeaceful()
 	);
 	public static final EntityType<FrozenZombieVillagerEntity> FROZEN_ZOMBIE_VILLAGER = register(
 			"frozen_zombie_villager",
@@ -135,12 +131,10 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.vehicleAttachment(-0.7F)
 					.eyeHeight(1.74F)
 					.maxTrackingRange(8)
-					.notAllowedInPeaceful()
 	);
 	public static final EntityType<FrozenZombieVillagerSnowballEntity> FROZEN_ZOMBIE_VILLAGER_SNOWBALL = register(
 			"frozen_zombie_villager_snowball",
 			EntityType.Builder.<FrozenZombieVillagerSnowballEntity>create(FrozenZombieVillagerSnowballEntity::new, SpawnGroup.MISC)
-					.dropsNothing()
 					.dimensions(0.25F, 0.25F)
 					.maxTrackingRange(4)
 					.trackingTickInterval(10)
@@ -153,7 +147,6 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.vehicleAttachment(-0.7F)
 					.eyeHeight(1.74F)
 					.maxTrackingRange(8)
-					.notAllowedInPeaceful()
 	);
 	public static final EntityType<LobberZombieVillagerEntity> LOBBER_ZOMBIE_VILLAGER = register(
 			"lobber_zombie_villager",
@@ -163,32 +156,28 @@ public class ZombieVillagerVariants implements ModInitializer {
 					.vehicleAttachment(-0.7F)
 					.eyeHeight(1.74F)
 					.maxTrackingRange(8)
-					.notAllowedInPeaceful()
 	);
 	public static final EntityType<LobberZombieVillagerThrownFleshEntity> LOBBER_ZOMBIE_VILLAGER_THROWN_FLESH = register(
 			"lobber_zombie_villager_thrown_flesh",
 			EntityType.Builder.<LobberZombieVillagerThrownFleshEntity>create(LobberZombieVillagerThrownFleshEntity::new, SpawnGroup.MISC)
-					.dropsNothing()
 					.dimensions(0.25F, 0.25F)
 					.maxTrackingRange(4)
 					.trackingTickInterval(10)
 	);
 	public static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> type) {
-		RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, name));
-		EntityType<T> entityType = type.build(key);
-		Registry.register(Registries.ENTITY_TYPE, key, entityType);
-		return entityType;
+		Identifier id = Identifier.of(MOD_ID, name);
+		return Registry.register(Registries.ENTITY_TYPE, id, type.build(id.toString()));
 	}
 
-	public static final Item DROWNED_VILLAGER_SPAWN_EGG = register("drowned_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(DROWNED_VILLAGER));
-	public static final Item VILLAGER_HUSK_SPAWN_EGG = register("villager_husk_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(VILLAGER_HUSK));
-	public static final Item BOULDERING_ZOMBIE_VILLAGER_SPAWN_EGG = register("bouldering_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(BOULDERING_ZOMBIE_VILLAGER));
-	public static final Item FROZEN_ZOMBIE_VILLAGER_SPAWN_EGG = register("frozen_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(FROZEN_ZOMBIE_VILLAGER));
-	public static final Item JUNGLE_ZOMBIE_VILLAGER_SPAWN_EGG = register("jungle_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(JUNGLE_ZOMBIE_VILLAGER));
-	public static final Item LOBBER_ZOMBIE_VILLAGER_SPAWN_EGG = register("lobber_zombie_villager_spawn_egg", SpawnEggItem::new, new Item.Settings().spawnEgg(LOBBER_ZOMBIE_VILLAGER));
+	public static final Item DROWNED_VILLAGER_SPAWN_EGG = register("drowned_villager_spawn_egg", settings -> new SpawnEggItem(DROWNED_VILLAGER, 0xffffff, 0xffffff, settings), new Item.Settings());
+	public static final Item VILLAGER_HUSK_SPAWN_EGG = register("villager_husk_spawn_egg", settings -> new SpawnEggItem(VILLAGER_HUSK, 0xffffff, 0xffffff, settings), new Item.Settings());
+	public static final Item BOULDERING_ZOMBIE_VILLAGER_SPAWN_EGG = register("bouldering_zombie_villager_spawn_egg", settings -> new SpawnEggItem(BOULDERING_ZOMBIE_VILLAGER, 0xffffff, 0xffffff, settings), new Item.Settings());
+	public static final Item FROZEN_ZOMBIE_VILLAGER_SPAWN_EGG = register("frozen_zombie_villager_spawn_egg", settings -> new SpawnEggItem(FROZEN_ZOMBIE_VILLAGER, 0xffffff, 0xffffff, settings), new Item.Settings());
+	public static final Item JUNGLE_ZOMBIE_VILLAGER_SPAWN_EGG = register("jungle_zombie_villager_spawn_egg", settings -> new SpawnEggItem(JUNGLE_ZOMBIE_VILLAGER, 0xffffff, 0xffffff, settings), new Item.Settings());
+	public static final Item LOBBER_ZOMBIE_VILLAGER_SPAWN_EGG = register("lobber_zombie_villager_spawn_egg", settings -> new SpawnEggItem(LOBBER_ZOMBIE_VILLAGER, 0xffffff, 0xffffff, settings), new Item.Settings());
 	public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
 		RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, name));
-		Item item = itemFactory.apply(settings.registryKey(key));
+		Item item = itemFactory.apply(settings);
 		Registry.register(Registries.ITEM, key, item);
 		return item;
 	}

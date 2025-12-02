@@ -11,5 +11,5 @@ import net.minecraft.util.Identifier;
 public class BoulderingZombieVillagerEntityRenderer extends ExtendedZombieVillagerEntityRenderer<BoulderingZombieVillagerEntity> {
 	public static final Identifier TEXTURE = Identifier.of(ZombieVillagerVariants.MOD_ID,"textures/entity/bouldering_zombie_villager/bouldering_zombie_villager.png");
 	public BoulderingZombieVillagerEntityRenderer(EntityRendererFactory.Context context) { super(context); }
-	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
+	@Override public Identifier getTexture(BoulderingZombieVillagerEntity zombieVillagerRenderState) { return TEXTURE; }
 }

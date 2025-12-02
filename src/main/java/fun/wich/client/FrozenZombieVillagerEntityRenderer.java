@@ -1,7 +1,7 @@
 package fun.wich.client;
 
-import fun.wich.ZombieVillagerVariants;
 import fun.wich.FrozenZombieVillagerEntity;
+import fun.wich.ZombieVillagerVariants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -13,7 +13,7 @@ public class FrozenZombieVillagerEntityRenderer extends ExtendedZombieVillagerEn
 	public static final Identifier SKIN = Identifier.of(ZombieVillagerVariants.MOD_ID,"textures/entity/frozen_zombie_villager/frozen_zombie_villager_outer_layer.png");
 	public FrozenZombieVillagerEntityRenderer(EntityRendererFactory.Context context) {
 		super(context);
-		this.addFeature(new ZombieVillagerOverlayFeatureRenderer(this, context.getEntityModels(), SKIN));
+		this.addFeature(new ZombieVillagerOverlayFeatureRenderer<>(this, context.getModelLoader(), SKIN));
 	}
-	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
+	@Override public Identifier getTexture(FrozenZombieVillagerEntity state) { return TEXTURE; }
 }

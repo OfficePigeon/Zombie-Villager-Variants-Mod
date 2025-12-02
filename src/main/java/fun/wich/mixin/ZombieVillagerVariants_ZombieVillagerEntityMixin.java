@@ -1,19 +1,20 @@
 package fun.wich.mixin;
 
+import com.mojang.serialization.Dynamic;
 import fun.wich.ExtendedZombieVillagerEntity;
 import fun.wich.Mixin_VillagerExposing;
 import fun.wich.ZombieVillagerFreezeTracker;
 import fun.wich.ZombieVillagerVariants;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.conversion.EntityConversionContext;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombieVillagerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.village.TradeOfferList;
 import net.minecraft.village.VillagerData;
 import net.minecraft.village.VillagerGossips;
@@ -32,18 +33,22 @@ public abstract class ZombieVillagerVariants_ZombieVillagerEntityMixin extends Z
 	private static final TrackedData<Boolean> ZOMBIE_VILLAGER_CONVERTING_IN_SNOW = DataTracker.registerData(ZombieVillagerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	public ZombieVillagerVariants_ZombieVillagerEntityMixin(EntityType<? extends ZombieEntity> entityType, World world) { super(entityType, world); }
 	//Expose Villager Fields
-	@Shadow private VillagerGossips gossip;
+	@Shadow private NbtElement gossipData;
 	@Shadow private TradeOfferList offerData;
 	@Shadow public abstract VillagerData getVillagerData();
-	@Shadow public abstract int getExperience();
+	@Shadow private int xp;
 	@Override
 	public VillagerData Mixin_VillagerExposing_GetVillagerData() { return this.getVillagerData(); }
 	@Override
-	public VillagerGossips Mixin_VillagerExposing_GetGossip() { return this.gossip; }
+	public VillagerGossips Mixin_VillagerExposing_GetGossip() {
+		VillagerGossips gossip = new VillagerGossips();
+		gossip.deserialize(new Dynamic<>(NbtOps.INSTANCE, gossipData));
+		return gossip;
+	}
 	@Override
 	public TradeOfferList Mixin_VillagerExposing_GetOfferData() { return this.offerData; }
 	@Override
-	public int Mixin_VillagerExposing_GetExperience() { return this.getExperience(); }
+	public int Mixin_VillagerExposing_GetExperience() { return this.xp; }
 	//Conversion in Water
 	@Inject(method="canConvertInWater", at=@At("HEAD"), cancellable=true)
 	private void AllowConversionInWater(CallbackInfoReturnable<Boolean> cir) {
@@ -71,15 +76,15 @@ public abstract class ZombieVillagerVariants_ZombieVillagerEntityMixin extends Z
 	}
 	@Override
 	public boolean ZombieVillagerFreezeTracker_IsShaking() { return this.getDataTracker().get(ZOMBIE_VILLAGER_CONVERTING_IN_SNOW); }
-	@Inject(method="writeCustomData", at=@At("TAIL"))
-	protected void Mixin_WriteCustomData(WriteView view, CallbackInfo ci) {
+	@Inject(method="writeCustomDataToNbt", at=@At("TAIL"))
+	protected void Mixin_WriteCustomData(NbtCompound view, CallbackInfo ci) {
 		view.putInt("VillagerInPowderSnow", this.isTouchingWater() ? this.inPowderSnowTime : -1);
 		view.putInt("VillagerSnowConversionTime", this.getDataTracker().get(ZOMBIE_VILLAGER_CONVERTING_IN_SNOW) ? this.ticksUntilSnowConversion : -1);
 	}
-	@Inject(method="readCustomData", at=@At("TAIL"))
-	protected void Mixin_ReadCustomData(ReadView view, CallbackInfo ci) {
-		this.inPowderSnowTime = view.getInt("VillagerInPowderSnow", -1);
-		int i = view.getInt("VillagerSnowConversionTime", -1);
+	@Inject(method="readCustomDataFromNbt", at=@At("TAIL"))
+	protected void Mixin_ReadCustomData(NbtCompound view, CallbackInfo ci) {
+		this.inPowderSnowTime = view.contains("VillagerInPowderSnow") ? view.getInt("VillagerInPowderSnow") : -1;
+		int i = view.contains("VillagerSnowConversionTime") ? view.getInt("VillagerSnowConversionTime") : -1;
 		if (i < 0) this.ticksUntilSnowConversion = -1;
 		this.getDataTracker().set(ZOMBIE_VILLAGER_CONVERTING_IN_SNOW, false);
 	}
@@ -93,11 +98,10 @@ public abstract class ZombieVillagerVariants_ZombieVillagerEntityMixin extends Z
 				if (this.getDataTracker().get(ZOMBIE_VILLAGER_CONVERTING_IN_SNOW)) {
 					--this.ticksUntilSnowConversion;
 					if (this.ticksUntilSnowConversion < 0) {
-						this.convertTo(ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER, EntityConversionContext.create(this, true, true), zombie -> {
-							if (!this.isSilent()) {
-								this.getEntityWorld().playSound(null, this.getBlockPos(), ZombieVillagerVariants.ENTITY_ZOMBIE_VILLAGER_CONVERTED_TO_FROZEN_ZOMBIE_VILLAGER, SoundCategory.HOSTILE, 2.0f, (random.nextFloat() - random.nextFloat()) * 0.2f + 1);
-							}
-						});
+						this.convertTo(ZombieVillagerVariants.FROZEN_ZOMBIE_VILLAGER, true);
+						if (!this.isSilent()) {
+							this.getEntityWorld().playSound(null, this.getBlockPos(), ZombieVillagerVariants.ENTITY_ZOMBIE_VILLAGER_CONVERTED_TO_FROZEN_ZOMBIE_VILLAGER, SoundCategory.HOSTILE, 2.0f, (random.nextFloat() - random.nextFloat()) * 0.2f + 1);
+						}
 					}
 				}
 				else {

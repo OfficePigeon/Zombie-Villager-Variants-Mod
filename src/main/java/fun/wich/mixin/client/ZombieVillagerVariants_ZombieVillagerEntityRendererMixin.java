@@ -2,18 +2,17 @@ package fun.wich.mixin.client;
 
 import fun.wich.ZombieVillagerFreezeTracker;
 import net.minecraft.client.render.entity.ZombieVillagerEntityRenderer;
-import net.minecraft.client.render.entity.state.ZombieVillagerRenderState;
 import net.minecraft.entity.mob.ZombieVillagerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ZombieVillagerEntityRenderer.class)
 public class ZombieVillagerVariants_ZombieVillagerEntityRendererMixin {
-	@Inject(method="updateRenderState(Lnet/minecraft/entity/mob/ZombieVillagerEntity;Lnet/minecraft/client/render/entity/state/ZombieVillagerRenderState;F)V", at=@At("TAIL"))
-	private void AllowShakingWhileConverting(ZombieVillagerEntity entity, ZombieVillagerRenderState state, float f, CallbackInfo ci) {
-		state.convertingInWater = entity.isConverting() || entity.isConvertingInWater();
-		if (entity instanceof ZombieVillagerFreezeTracker freeze && freeze.ZombieVillagerFreezeTracker_IsShaking()) state.shaking = true;
+	@Inject(method="isShaking(Lnet/minecraft/entity/mob/ZombieVillagerEntity;)Z", at=@At("HEAD"), cancellable=true)
+	protected void AllowShakingWhileConverting(ZombieVillagerEntity entity, CallbackInfoReturnable<Boolean> cir) {
+		if (entity.isConverting() || entity.isConvertingInWater()) cir.setReturnValue(true);
+		if (entity instanceof ZombieVillagerFreezeTracker freeze && freeze.ZombieVillagerFreezeTracker_IsShaking()) cir.setReturnValue(true);
 	}
 }

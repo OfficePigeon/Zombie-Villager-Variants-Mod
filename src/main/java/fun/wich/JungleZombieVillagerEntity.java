@@ -1,7 +1,6 @@
 package fun.wich;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.Shearable;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
@@ -10,6 +9,10 @@ import net.minecraft.entity.mob.ZombieVillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -25,24 +28,27 @@ public class JungleZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (itemStack.isOf(Items.SHEARS) && this.isShearable()) {
-			if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
-				this.sheared(serverWorld, SoundCategory.PLAYERS, itemStack);
-				this.emitGameEvent(GameEvent.SHEAR, player);
-				itemStack.damage(1, player, hand.getEquipmentSlot());
-			}
+			this.sheared(SoundCategory.PLAYERS);
+			this.emitGameEvent(GameEvent.SHEAR, player);
+			if (!this.getWorld().isClient) itemStack.damage(1, player, getSlotForHand(hand));
 			return ActionResult.SUCCESS;
 		}
 		else return super.interactMob(player, hand);
 	}
 	@Override
-	public void sheared(ServerWorld world, SoundCategory shearedSoundCategory, ItemStack shears) {
-		world.playSoundFromEntity(null, this, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR, shearedSoundCategory, 1, 1);
+	public void sheared(SoundCategory shearedSoundCategory) {
+		this.getEntityWorld().playSoundFromEntity(null, this, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR, shearedSoundCategory, 1, 1);
 		ConvertToZombieVillagerEntity(this, EntityType.ZOMBIE_VILLAGER, ZombieVillagerVariants.ENTITY_JUNGLE_ZOMBIE_VILLAGER_SHEAR);
-		this.forEachShearedItem(world, ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER_SHEARING, shears, (worldx, stack) -> {
-			for (int i = 0; i < stack.getCount(); ++i) {
-				worldx.spawnEntity(new ItemEntity(this.getEntityWorld(), this.getX(), this.getBodyY(1), this.getZ(), stack.copyWithCount(1)));
+		if (this.getWorld() instanceof ServerWorld serverWorld) {
+			LootTable lootTable = serverWorld.getServer().getReloadableRegistries().getLootTable(ZombieVillagerVariants.JUNGLE_ZOMBIE_VILLAGER_SHEARING);
+			LootContextParameterSet lootContextParameterSet = new LootContextParameterSet.Builder(serverWorld)
+					.add(LootContextParameters.ORIGIN, this.getPos())
+					.add(LootContextParameters.THIS_ENTITY, this)
+					.build(LootContextTypes.SHEARING);
+			for (ItemStack itemStack : lootTable.generateLoot(lootContextParameterSet)) {
+				this.dropStack(itemStack, this.getHeight());
 			}
-		});
+		}
 	}
 	@Override
 	public boolean isShearable() { return this.isAlive() && !this.isBaby(); }

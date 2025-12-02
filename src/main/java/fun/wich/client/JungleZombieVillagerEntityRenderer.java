@@ -13,7 +13,7 @@ public class JungleZombieVillagerEntityRenderer extends ExtendedZombieVillagerEn
 	public static final Identifier SKIN = Identifier.of(ZombieVillagerVariants.MOD_ID,"textures/entity/jungle_zombie_villager/jungle_zombie_villager_outer_layer.png");
 	public JungleZombieVillagerEntityRenderer(EntityRendererFactory.Context context) {
 		super(context);
-		this.addFeature(new ZombieVillagerOverlayFeatureRenderer(this, context.getEntityModels(), SKIN));
+		this.addFeature(new ZombieVillagerOverlayFeatureRenderer<>(this, context.getModelLoader(), SKIN));
 	}
-	@Override public Identifier getTexture(ExtendedZombieVillagerRenderState state) { return TEXTURE; }
+	@Override public Identifier getTexture(JungleZombieVillagerEntity state) { return TEXTURE; }
 }

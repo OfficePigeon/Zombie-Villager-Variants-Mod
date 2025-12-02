@@ -2,7 +2,8 @@ package fun.wich;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -11,9 +12,9 @@ import net.minecraft.entity.mob.ZombieVillagerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.storage.ReadView;
 import net.minecraft.util.Arm;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
@@ -44,8 +45,9 @@ public class LobberZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 		double f = target.getZ() - this.getZ();
 		double g = Math.sqrt(d * d + f * f) * 0.2;
 		if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
-			ItemStack itemStack = new ItemStack(Items.ROTTEN_FLESH);
-			ProjectileEntity.spawn(new LobberZombieVillagerThrownFleshEntity(serverWorld, this, itemStack), serverWorld, itemStack, (entity) -> entity.setVelocity(d, e + g - entity.getY(), f, 1.6F, 6.0F));
+			ProjectileEntity entity = new LobberZombieVillagerThrownFleshEntity(serverWorld, this);
+			entity.setVelocity(d, e + g - entity.getY(), f, 1.6F, 6.0F);
+			serverWorld.spawnEntity(entity);
 		}
 		this.playSound(ZombieVillagerVariants.ENTITY_LOBBER_ZOMBIE_VILLAGER_THROW, 1.0F, 0.4F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
 	}
@@ -76,8 +78,8 @@ public class LobberZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 		this.equipStack(EquipmentSlot.CHEST, ItemStack.EMPTY);
 	}
 	@Override
-	protected void readCustomData(ReadView view) {
-		super.readCustomData(view);
+	public void readCustomDataFromNbt(NbtCompound view) {
+		super.readCustomDataFromNbt(view);
 		this.updateAttackType();
 	}
 	@Override

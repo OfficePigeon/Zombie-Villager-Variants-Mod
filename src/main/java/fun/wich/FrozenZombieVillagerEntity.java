@@ -5,7 +5,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.ProjectileAttackGoal;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
@@ -13,8 +14,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombieVillagerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
@@ -65,8 +64,9 @@ public class FrozenZombieVillagerEntity extends ExtendedZombieVillagerEntity imp
 		double f = target.getZ() - this.getZ();
 		double g = Math.sqrt(d * d + f * f) * 0.2;
 		if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
-			ItemStack itemStack = new ItemStack(Items.SNOWBALL);
-			ProjectileEntity.spawn(new FrozenZombieVillagerSnowballEntity(serverWorld, this, itemStack), serverWorld, itemStack, (entity) -> entity.setVelocity(d, e + g - entity.getY(), f, 1.6F, 12.0F));
+			ProjectileEntity entity = new FrozenZombieVillagerSnowballEntity(serverWorld, this);
+			entity.setVelocity(d, e + g - entity.getY(), f, 1.6F, 12.0F);
+			serverWorld.spawnEntity(entity);
 		}
 		this.playSound(SoundEvents.ENTITY_SNOWBALL_THROW, 1.0F, 0.4F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
 	}
