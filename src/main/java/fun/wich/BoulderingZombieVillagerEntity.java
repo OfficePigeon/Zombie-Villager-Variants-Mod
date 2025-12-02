@@ -31,8 +31,6 @@ public class BoulderingZombieVillagerEntity extends ExtendedZombieVillagerEntity
 	@Override
 	public SoundEvent GetCureSound() { return ZombieVillagerVariants.ENTITY_BOULDERING_ZOMBIE_VILLAGER_CURE; }
 	@Override
-	public boolean burnsInDaylight() { return false; }
-	@Override
 	public SoundEvent getAmbientSound() { return ZombieVillagerVariants.ENTITY_BOULDERING_ZOMBIE_VILLAGER_AMBIENT; }
 	@Override
 	public SoundEvent getHurtSound(DamageSource source) { return ZombieVillagerVariants.ENTITY_BOULDERING_ZOMBIE_VILLAGER_HURT; }
