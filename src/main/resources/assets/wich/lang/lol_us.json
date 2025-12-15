@@ -12,7 +12,7 @@
   "subtitles.entity.drowned_villager.shoot": "Unded Watuur Villaguur launches fork",
   "subtitles.entity.drowned_villager.step": "Unded Watuur Villaguur futstapz",
   "subtitles.entity.drowned_villager.swim": "Unded Watuur Villaguur swimz",
-  "subtitles.entity.parrot.imitate.drowned_villager": "Parrot gurglze",
+  "subtitles.entity.parrot.imitate.drowned_villager": "Rainbow Bird gurglze",
   
   "entity.wich.villager_husk": "Villaguur mummy ting",
   "item.wich.villager_husk_spawn_egg": "Villaguur mummy ting spon ec",
@@ -22,7 +22,7 @@
   "subtitles.entity.villager_husk.cure": "Villaguur mummy ting sniffz",
   "subtitles.entity.villager_husk.death": "Villaguur mummy ting gets rekt",
   "subtitles.entity.villager_husk.hurt": "Villaguur mummy ting hurtz",
-  "subtitles.entity.parrot.imitate.villager_husk": "Parrot groonz",
+  "subtitles.entity.parrot.imitate.villager_husk": "Rainbow Bird groonz",
   
   "entity.wich.bouldering_zombie_villager": "Climby unded villaguur",
   "item.wich.bouldering_zombie_villager_spawn_egg": "Climby unded villaguur spon ec",
@@ -32,7 +32,7 @@
   "subtitles.entity.bouldering_zombie_villager.death": "Climby unded villaguur gets rekt",
   "subtitles.entity.bouldering_zombie_villager.hurt": "Climby unded villaguur hurtz",
   "subtitles.entity.bouldering_zombie_villager.climb": "Climby unded villaguur climbs",
-  "subtitles.entity.parrot.imitate.bouldering_zombie_villager": "Parrot groonz",
+  "subtitles.entity.parrot.imitate.bouldering_zombie_villager": "Rainbow Bird groonz",
   
   "entity.wich.frozen_zombie_villager": "Frzo unded villaguur",
   "entity.wich.frozen_zombie_villager_snowball": "Cold wet",
@@ -44,7 +44,7 @@
   "subtitles.entity.frozen_zombie_villager.cure": "Frzo unded villaguur sniffz",
   "subtitles.entity.frozen_zombie_villager.death": "Frzo unded villaguur gets rekt",
   "subtitles.entity.frozen_zombie_villager.hurt": "Frzo unded villaguur hurtz",
-  "subtitles.entity.parrot.imitate.frozen_zombie_villager": "Parrot groonz",
+  "subtitles.entity.parrot.imitate.frozen_zombie_villager": "Rainbow Bird groonz",
   
   "entity.wich.jungle_zombie_villager": "Unded jungl villaguur",
   "item.wich.jungle_zombie_villager_spawn_egg": "Unded jungl villaguur spon ec",
@@ -53,7 +53,7 @@
   "subtitles.entity.jungle_zombie_villager.cure": "Unded jungl villaguur sniffz",
   "subtitles.entity.jungle_zombie_villager.death": "Unded jungl villaguur gets rekt",
   "subtitles.entity.jungle_zombie_villager.hurt": "Unded jungl villaguur hurtz",
-  "subtitles.entity.parrot.imitate.jungle_zombie_villager": "Parrot groonz",
+  "subtitles.entity.parrot.imitate.jungle_zombie_villager": "Rainbow Bird groonz",
   
   "entity.wich.lobber_zombie_villager": "Thruar unded villaguur",
   "entity.wich.lobber_zombie_villager_thrown_flesh": "Taestz Laik Brokali",
@@ -64,5 +64,5 @@
   "subtitles.entity.lobber_zombie_villager.death": "Thruar unded villaguur gets rekt",
   "subtitles.entity.lobber_zombie_villager.hurt": "Thruar unded villaguur hurtz",
   "subtitles.entity.lobber_zombie_villager.throw": "Thruar unded villaguur throws",
-  "subtitles.entity.parrot.imitate.lobber_zombie_villager": "Parrot groonz"
+  "subtitles.entity.parrot.imitate.lobber_zombie_villager": "Rainbow Bird groonz"
 }
